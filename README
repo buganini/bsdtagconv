@@ -6,5 +6,6 @@ Note:
 Example:
 	bsdtagconv 'utf-8,ascii:zhtw:zhtw_words:utf-8,ascii' blah.mp3
 
-Dependency:
+Dependencies:
+	bsdconv-4.9
 	audio/taglib (http://developer.kde.org/~wheeler/taglib.html)
