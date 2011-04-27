@@ -41,7 +41,7 @@ int proc(char *file){
 		cout << "\tartist  - \"" << conv(tag->artist().to8Bit(true).c_str())  << "\"" << endl;
 		cout << "\talbum   - \"" << conv(tag->album().to8Bit(true).c_str())   << "\"" << endl;
 		cout << "\tyear    - \"" << tag->year()    << "\"" << endl;
-		cout << "\tcomment - \"" << tag->comment() << "\"" << endl;
+		cout << "\tcomment - \"" << conv(tag->comment().to8Bit().c_str()) << "\"" << endl;
 		cout << "\ttrack   - \"" << tag->track()   << "\"" << endl;
 		cout << "\tgenre   - \"" << tag->genre()   << "\"" << endl;
 	}
