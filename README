@@ -1,4 +1,4 @@
-DANGER: THIS IS IN EARLY DEVELOPEMENT !
+NOTICE: THIS IS IN EARLY DEVELOPEMENT ! but it's safe without --notest
 
 Note:
 	Currently only works when taglib can correcly decode tag,
