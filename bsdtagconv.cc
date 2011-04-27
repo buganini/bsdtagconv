@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cstring>
+#include <string>
 #include <string.h>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
@@ -35,9 +37,9 @@ int proc(char *file){
 	TagLib::FileRef f(file);
 	if(!f.isNull() && f.tag()) {
 		TagLib::Tag *tag = f.tag();
-		cout << "\ttitle   - \"" << conv(tag->title().toCString(true))   << "\"" << endl;
-		cout << "\tartist  - \"" << conv(tag->artist().toCString(true))  << "\"" << endl;
-		cout << "\talbum   - \"" << conv(tag->album().toCString(true))   << "\"" << endl;
+		cout << "\ttitle   - \"" << conv(tag->title().to8Bit(true).c_str())   << "\"" << endl;
+		cout << "\tartist  - \"" << conv(tag->artist().to8Bit(true).c_str())  << "\"" << endl;
+		cout << "\talbum   - \"" << conv(tag->album().to8Bit(true).c_str())   << "\"" << endl;
 		cout << "\tyear    - \"" << tag->year()    << "\"" << endl;
 		cout << "\tcomment - \"" << tag->comment() << "\"" << endl;
 		cout << "\ttrack   - \"" << tag->track()   << "\"" << endl;
