@@ -112,7 +112,7 @@ int main(int argc, char *argv[]){
 
 	//check
 	if(argc<3){
-		fprintf(stderr, "Usage: %s conversion[;conversion...] files\n", argv[0]);
+		cerr << "Usage: bsdtagconv conversion[;conversion...] files" << endl;
 		exit(1);
 	}
 
