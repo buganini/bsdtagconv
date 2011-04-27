@@ -52,7 +52,9 @@ const char * conv(TagLib::Tag *tag, int field){
 		bsdconv(ins);
 		if(ins->ierr + ins->oerr==0){
 			ins->output_mode=BSDCONV_AUTOMALLOC;
+			ins->output.len=1;
 			bsdconv(ins);
+			((char *)ins->output.data)[ins->output.len]=0;
 			break;
 		}
 	}
