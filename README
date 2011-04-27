@@ -9,6 +9,8 @@ Note:
 
 Example:
 	bsdtagconv 'utf-8,ascii:zhtw:zhtw_words:utf-8,ascii' blah.mp3
+	you can use multiple converions joined with ';', bsdtagconv will
+	use the one with no conversion failure.
 
 Dependencies:
 	bsdconv-4.9 (or 4.X && bsdconv.h fix for C++)
