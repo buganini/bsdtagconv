@@ -1,7 +1,9 @@
 DANGER: THIS IS IN EARLY DEVELOPEMENT !
 
 Note:
-	currently only works for utf-8 encoding
+	currently only works when taglib can correcly decode tag,
+	especially for id3v1, and conversion string needs to be ended with
+	utf-8,ascii
 
 Example:
 	bsdtagconv 'utf-8,ascii:zhtw:zhtw_words:utf-8,ascii' blah.mp3
