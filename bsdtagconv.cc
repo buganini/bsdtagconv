@@ -7,14 +7,40 @@
 #include <taglib/tstring.h>
 #include <bsdconv.h>
 
+enum field{
+	TITLE,
+	ARTIST,
+	ALBUM,
+	COMMENT,
+	GENRE
+};
+
 using namespace std;
 
-int convn;
+int convn,testarg,skiparg;
 struct bsdconv_instance **convs;
 
-char * conv(const char *s){
+TagLib::String conv(TagLib::Tag *tag, int field){
 	int i;
-	struct bsdconv_instance *ins;
+	const char *s=NULL;
+	struct bsdconv_instance *ins=NULL;
+	switch(field){
+		case TITLE:
+			s=tag->title().to8Bit(true).c_str();
+			break;
+		case ARTIST:
+			s=tag->artist().to8Bit(true).c_str();
+			break;
+		case ALBUM:
+			s=tag->album().to8Bit(true).c_str();
+			break;
+		case COMMENT:
+			s=tag->comment().to8Bit(true).c_str();
+			break;
+		case GENRE:
+			s=tag->genre().to8Bit(true).c_str();
+			break;
+	}
 	for(i=0;i<convn;++i){
 		ins=convs[i];
 		bsdconv_init(ins);
@@ -27,30 +53,58 @@ char * conv(const char *s){
 		if(ins->ierr + ins->oerr==0){
 			ins->output_mode=BSDCONV_AUTOMALLOC;
 			bsdconv(ins);
-			return (char *)ins->output.data;
+			break;
 		}
 	}
-	return "";
+	TagLib::String res((const char *)ins->output.data, TagLib::String::UTF8);
+	if(i<convn || skiparg==0){
+		if(testarg==0){
+			switch(field){
+				case TITLE:
+					tag->setTitle(res);
+					break;
+				case ARTIST:
+					tag->setArtist(res);
+					break;
+				case ALBUM:
+					tag->setAlbum(res);
+					break;
+				case COMMENT:
+					tag->setComment(res);
+					break;
+				case GENRE:
+					tag->setGenre(res);
+					break;
+			}
+		}
+	}
+	return res;
 }
 
 int proc(char *file){
 	TagLib::FileRef f(file);
 	if(!f.isNull() && f.tag()) {
 		TagLib::Tag *tag = f.tag();
-		cout << "\ttitle   - \"" << conv(tag->title().to8Bit(true).c_str())   << "\"" << endl;
-		cout << "\tartist  - \"" << conv(tag->artist().to8Bit(true).c_str())  << "\"" << endl;
-		cout << "\talbum   - \"" << conv(tag->album().to8Bit(true).c_str())   << "\"" << endl;
+		cout << "\ttitle   - \"" << conv(tag, TITLE)   << "\"" << endl;
+		cout << "\tartist  - \"" << conv(tag, ARTIST)  << "\"" << endl;
+		cout << "\talbum   - \"" << conv(tag, ALBUM)   << "\"" << endl;
 		cout << "\tyear    - \"" << tag->year()    << "\"" << endl;
-		cout << "\tcomment - \"" << conv(tag->comment().to8Bit().c_str()) << "\"" << endl;
+		cout << "\tcomment - \"" << conv(tag, COMMENT) << "\"" << endl;
 		cout << "\ttrack   - \"" << tag->track()   << "\"" << endl;
-		cout << "\tgenre   - \"" << tag->genre()   << "\"" << endl;
+		cout << "\tgenre   - \"" << conv(tag, GENRE)   << "\"" << endl;
+	}
+	if(testarg==0){
+		f.save();
 	}
 	return 1;
 }
 
 int main(int argc, char *argv[]){
-	int i;
-	char *c, *t,*convarg=strdup(argv[1]);
+	int i,argb;
+	char *c, *t,*convarg;
+
+	testarg=1;
+	skiparg=1;
 
 	//check
 	if(argc<3){
@@ -60,6 +114,7 @@ int main(int argc, char *argv[]){
 
 	//initialize
 	convn=1;
+	convarg=strdup(argv[1]);
 	for(c=convarg;*c;++c)
 		if(*c==';')
 			++convn;
@@ -79,8 +134,21 @@ int main(int argc, char *argv[]){
 	}
 	free(convarg);
 
+	for(argb=2;argb<argc;++argb){
+		if(strcmp(argv[argb],"--notest")==0){
+			testarg=0;
+		}else if(strcmp(argv[argb],"--noskip")==0){
+			skiparg=0;
+		}else if(strcmp(argv[argb],"--")==0){
+			break;
+		}else{
+			argb-=1;
+			break;
+		}
+	}
+
 	//proceed
-	for(i=2;i<argc;++i){
+	for(i=argb;i<argc;++i){
 		cout << argv[i] << endl;
 		proc(argv[i]);
 	}
