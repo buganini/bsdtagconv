@@ -1,5 +1,8 @@
 DANGER: THIS IS IN EARLY DEVELOPEMENT !
 
+Note:
+	currently only works for utf-8 encoding
+
 bsdtagconv 'utf-8,ascii:zhtw:zhtw_words:utf-8,ascii' blah.mp3
 
 Dependency:
