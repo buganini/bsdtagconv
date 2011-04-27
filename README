@@ -15,3 +15,7 @@ Example:
 Dependencies:
 	bsdconv-4.9 (or 4.X && bsdconv.h fix for C++)
 	audio/taglib (http://developer.kde.org/~wheeler/taglib.html)
+
+TODO:
+	allow setting encoding for id3v1
+	migrate from id3v1 to id3v2
