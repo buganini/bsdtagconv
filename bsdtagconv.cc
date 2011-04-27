@@ -128,6 +128,7 @@ int main(int argc, char *argv[]){
 		t=strsep(&c, ";");
 		if(NULL==(convs[i]=bsdconv_create(t))){
 			//exception
+			cerr << bsdconv_error() << endl;
 			for(i-=1;i>=0;--i){
 				bsdconv_destroy(convs[i]);
 			}
@@ -164,7 +165,7 @@ int main(int argc, char *argv[]){
 	free(convs);
 
 	if(testarg)
-		fprintf(stderr, "\nUse --notest to actually write the files\n");
+		cerr << endl << "Use --notest to actually write the files" << endl;
 
 	return 0;
 }
