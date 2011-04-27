@@ -2,6 +2,7 @@
 #include <string.h>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
+#include <taglib/tstring.h>
 #include <bsdconv.h>
 
 using namespace std;
@@ -9,14 +10,14 @@ using namespace std;
 int convn;
 struct bsdconv_instance **convs;
 
-char * conv(char *s){
+char * conv(const char *s){
 	int i;
 	struct bsdconv_instance *ins;
 	for(i=0;i<convn;++i){
 		ins=convs[i];
 		bsdconv_init(ins);
 		ins->output_mode=BSDCONV_HOLD;
-		ins->input.data=s;
+		ins->input.data=(void *)s;
 		ins->input.len=strlen(s);
 		ins->input.flags=0;
 		ins->flush=1;
@@ -34,9 +35,9 @@ int proc(char *file){
 	TagLib::FileRef f(file);
 	if(!f.isNull() && f.tag()) {
 		TagLib::Tag *tag = f.tag();
-		cout << "\ttitle   - \"" << tag->title()   << "\"" << endl;
-		cout << "\tartist  - \"" << tag->artist()  << "\"" << endl;
-		cout << "\talbum   - \"" << tag->album()   << "\"" << endl;
+		cout << "\ttitle   - \"" << conv(tag->title().toCString(true))   << "\"" << endl;
+		cout << "\tartist  - \"" << conv(tag->artist().toCString(true))  << "\"" << endl;
+		cout << "\talbum   - \"" << conv(tag->album().toCString(true))   << "\"" << endl;
 		cout << "\tyear    - \"" << tag->year()    << "\"" << endl;
 		cout << "\tcomment - \"" << tag->comment() << "\"" << endl;
 		cout << "\ttrack   - \"" << tag->track()   << "\"" << endl;
