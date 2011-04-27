@@ -142,9 +142,9 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[argb],"--noskip")==0){
 			skiparg=0;
 		}else if(strcmp(argv[argb],"--")==0){
+			argb+=1;
 			break;
 		}else{
-			argb-=1;
 			break;
 		}
 	}
