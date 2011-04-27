@@ -34,14 +34,13 @@ int proc(char *file){
 	TagLib::FileRef f(file);
 	if(!f.isNull() && f.tag()) {
 		TagLib::Tag *tag = f.tag();
-		cout << "-- TAG --" << endl;
-		cout << "title   - \"" << tag->title()   << "\"" << endl;
-		cout << "artist  - \"" << tag->artist()  << "\"" << endl;
-		cout << "album   - \"" << tag->album()   << "\"" << endl;
-		cout << "year    - \"" << tag->year()    << "\"" << endl;
-		cout << "comment - \"" << tag->comment() << "\"" << endl;
-		cout << "track   - \"" << tag->track()   << "\"" << endl;
-		cout << "genre   - \"" << tag->genre()   << "\"" << endl;
+		cout << "\ttitle   - \"" << tag->title()   << "\"" << endl;
+		cout << "\tartist  - \"" << tag->artist()  << "\"" << endl;
+		cout << "\talbum   - \"" << tag->album()   << "\"" << endl;
+		cout << "\tyear    - \"" << tag->year()    << "\"" << endl;
+		cout << "\tcomment - \"" << tag->comment() << "\"" << endl;
+		cout << "\ttrack   - \"" << tag->track()   << "\"" << endl;
+		cout << "\tgenre   - \"" << tag->genre()   << "\"" << endl;
 	}
 	return 1;
 }
