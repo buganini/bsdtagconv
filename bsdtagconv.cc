@@ -20,7 +20,7 @@ using namespace std;
 int convn,testarg,skiparg;
 struct bsdconv_instance **convs;
 
-TagLib::String conv(TagLib::Tag *tag, int field){
+const char * conv(TagLib::Tag *tag, int field){
 	int i;
 	const char *s=NULL;
 	struct bsdconv_instance *ins=NULL;
@@ -78,7 +78,7 @@ TagLib::String conv(TagLib::Tag *tag, int field){
 			}
 		}
 	}
-	return res;
+	return res.to8Bit(true).c_str();
 }
 
 int proc(char *file){
