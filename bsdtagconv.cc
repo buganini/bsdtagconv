@@ -159,5 +159,8 @@ int main(int argc, char *argv[]){
 	}
 	free(convs);
 
+	if(testarg)
+		fprintf(stderr, "\nUse --notest to actually write the files");
+
 	return 0;
 }
