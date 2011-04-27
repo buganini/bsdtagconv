@@ -1,4 +1,6 @@
-NOTICE: THIS IS NOT WORKING YET !
+DANGER: THIS IS IN EARLY DEVELOPEMENT !
+
+bsdtagconv 'utf-8,ascii:zhtw:zhtw_words:utf-8,ascii' blah.mp3
 
 Dependency:
 	audio/taglib (http://developer.kde.org/~wheeler/taglib.html)
