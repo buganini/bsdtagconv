@@ -92,6 +92,8 @@ int proc(char *file){
 		cout << "\tcomment - \"" << conv(tag, COMMENT) << "\"" << endl;
 		cout << "\ttrack   - \"" << tag->track()   << "\"" << endl;
 		cout << "\tgenre   - \"" << conv(tag, GENRE)   << "\"" << endl;
+	}else{
+		return 0;
 	}
 	if(testarg==0){
 		f.save();
@@ -160,7 +162,7 @@ int main(int argc, char *argv[]){
 	free(convs);
 
 	if(testarg)
-		fprintf(stderr, "\nUse --notest to actually write the files");
+		fprintf(stderr, "\nUse --notest to actually write the files\n");
 
 	return 0;
 }
