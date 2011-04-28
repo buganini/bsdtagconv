@@ -66,29 +66,27 @@ class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
 	}
 };
 
-const char * conv(TagLib::Tag *tag, int field){
-	const char *s=NULL;
+TagLib::String conv(TagLib::Tag *tag, int field){
+	TagLib::String res;
 	switch(field){
 		case TITLE:
-			s=tag->title().to8Bit(true).c_str();
+			res=TagLib::String(tag->title().to8Bit(true).c_str(), TagLib::String::UTF8);
 			break;
 		case ARTIST:
-			s=tag->artist().to8Bit(true).c_str();
+			res=TagLib::String(tag->artist().to8Bit(true).c_str(), TagLib::String::UTF8);
 			break;
 		case ALBUM:
-			s=tag->album().to8Bit(true).c_str();
+			res=TagLib::String(tag->album().to8Bit(true).c_str(), TagLib::String::UTF8);
 			break;
 		case COMMENT:
-			s=tag->comment().to8Bit(true).c_str();
+			res=TagLib::String(tag->comment().to8Bit(true).c_str(), TagLib::String::UTF8);
 			break;
 		case GENRE:
-			s=tag->genre().to8Bit(true).c_str();
+			res=TagLib::String(tag->genre().to8Bit(true).c_str(), TagLib::String::UTF8);
 			break;
 		default:
 			return "";
 	}
-	printf("%s\n",s);
-	TagLib::String res(s, TagLib::String::UTF8);
 	if(skip==0 || skiparg==0){
 		if(testarg==0){
 			switch(field){
@@ -110,20 +108,20 @@ const char * conv(TagLib::Tag *tag, int field){
 			}
 		}
 	}
-	return res.to8Bit(true).c_str();
+	return res;
 }
 
 int proc(char *file){
 	TagLib::FileRef f(file);
 	if(!f.isNull() && f.tag()) {
 		TagLib::Tag *tag = f.tag();
-		cout << "\ttitle   - \"" << conv(tag, TITLE)   << "\"" << endl;
-		cout << "\tartist  - \"" << conv(tag, ARTIST)  << "\"" << endl;
-		cout << "\talbum   - \"" << conv(tag, ALBUM)   << "\"" << endl;
+		cout << "\ttitle   - \"" << conv(tag, TITLE).to8Bit(true).c_str()   << "\"" << endl;
+		cout << "\tartist  - \"" << conv(tag, ARTIST).to8Bit(true).c_str()  << "\"" << endl;
+		cout << "\talbum   - \"" << conv(tag, ALBUM).to8Bit(true).c_str()   << "\"" << endl;
 		cout << "\tyear    - \"" << tag->year()    << "\"" << endl;
-		cout << "\tcomment - \"" << conv(tag, COMMENT) << "\"" << endl;
+		cout << "\tcomment - \"" << conv(tag, COMMENT).to8Bit(true).c_str() << "\"" << endl;
 		cout << "\ttrack   - \"" << tag->track()   << "\"" << endl;
-		cout << "\tgenre   - \"" << conv(tag, GENRE)   << "\"" << endl;
+		cout << "\tgenre   - \"" << conv(tag, GENRE).to8Bit(true).c_str()   << "\"" << endl;
 	}else{
 		return 0;
 	}
