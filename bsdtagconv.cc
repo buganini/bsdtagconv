@@ -86,7 +86,7 @@ TagLib::String conv(TagLib::Tag *tag, int field){
 		default:
 			return "";
 	}
-
+	cout << res.to8Bit(true) << endl;
 	if(inter){
 		TagLib::ByteVector bv(res.to8Bit(true).c_str());
 		bsdconv_init(inter);
