@@ -70,23 +70,24 @@ TagLib::String conv(TagLib::Tag *tag, int field){
 	TagLib::String res;
 	switch(field){
 		case TITLE:
-			res=TagLib::String(tag->title().to8Bit(true).c_str(), TagLib::String::UTF8);
+			res=tag->title();
 			break;
 		case ARTIST:
-			res=TagLib::String(tag->artist().to8Bit(true).c_str(), TagLib::String::UTF8);
+			res=tag->artist();
 			break;
 		case ALBUM:
-			res=TagLib::String(tag->album().to8Bit(true).c_str(), TagLib::String::UTF8);
+			res=tag->album();
 			break;
 		case COMMENT:
-			res=TagLib::String(tag->comment().to8Bit(true).c_str(), TagLib::String::UTF8);
+			res=tag->comment();
 			break;
 		case GENRE:
-			res=TagLib::String(tag->genre().to8Bit(true).c_str(), TagLib::String::UTF8);
+			res=tag->genre();
 			break;
 		default:
 			return "";
 	}
+	//do inter conversion
 	if(skip==0 || skiparg==0){
 		if(testarg==0){
 			switch(field){
