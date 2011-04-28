@@ -60,10 +60,6 @@ class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
 		free(ins->output.data);
 		return ret;
 	}
-	virtual TagLib::ByteVector render( const TagLib::String &s ) const
-	{
-		return TagLib::ByteVector("", 0);
-	}
 };
 
 TagLib::String conv(TagLib::Tag *tag, int field){
