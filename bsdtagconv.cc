@@ -4,6 +4,7 @@
 #include <string.h>
 #include <taglib/tbytevector.h>
 #include <taglib/id3v1tag.h>
+#include <taglib/id3v2tag.h>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 #include <taglib/tstring.h>
@@ -39,6 +40,7 @@ class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
 			ins->flush=1;
 			bsdconv(ins);
 			score[i]=ins->score + ins->ierr*(-3) + ins->oerr*(-2);
+			cout << "Score["<<i<<"]: " << ins->score << " "<< ins->ierr << " "<< ins->oerr << " " << score[i] << endl;
 		}
 		max=0;
 		for(i=0;i<convn;++i){
@@ -56,6 +58,7 @@ class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
 		}else{
 			skip=0;
 		}
+		cout << (char *)ins->output.data << endl;
 		TagLib::String ret((const char *)ins->output.data, TagLib::String::UTF8);
 		free(ins->output.data);
 		return ret;
@@ -162,7 +165,7 @@ int main(int argc, char *argv[]){
 			free(convarg);
 			exit(1);
 		}
-//		bsdconv_insert_codec(convs[i], (char *)"NORMAL_SCORE", bsdconv_insert_phase(convs[i], INTER, 1), 0);
+		bsdconv_insert_codec(convs[i], (char *)"NORMAL_SCORE", bsdconv_insert_phase(convs[i], INTER, 1), 0);
 	}
 	free(convarg);
 
@@ -179,7 +182,8 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-	TagLib::ID3v1::Tag::setStringHandler( new ID3v1StringHandler() );
+	TagLib::ID3v1::Tag::setStringHandler(new ID3v1StringHandler());
+
 	//proceed
 	for(i=argb;i<argc;++i){
 		cout << argv[i] << endl;
