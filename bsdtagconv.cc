@@ -41,7 +41,6 @@ class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
 			ins->flush=1;
 			bsdconv(ins);
 			score[i]=ins->score + ins->ierr*(-3) + ins->oerr*(-2);
-			cout << "Score["<<i<<"]: " << ins->score << " "<< ins->ierr << " "<< ins->oerr << " " << score[i] << endl;
 		}
 		max=0;
 		for(i=0;i<convn;++i){
@@ -59,9 +58,9 @@ class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
 		}else{
 			skip=0;
 		}
-		cout << (char *)ins->output.data << endl;
 		TagLib::String ret((const char *)ins->output.data, TagLib::String::UTF8);
 		free(ins->output.data);
+		cout << ret.to8Bit(true) << endl;
 		return ret;
 	}
 };
