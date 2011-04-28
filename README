@@ -13,5 +13,4 @@ Dependencies:
 	audio/taglib (http://developer.kde.org/~wheeler/taglib.html)
 
 TODO:
-	allow setting encoding for id3v1
 	migrate from id3v1 to id3v2
