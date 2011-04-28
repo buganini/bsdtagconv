@@ -2,6 +2,8 @@
 #include <cstring>
 #include <string>
 #include <string.h>
+#include <taglib/tbytevector.h>
+#include <taglib/id3v1tag.h>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 #include <taglib/tstring.h>
@@ -17,13 +19,55 @@ enum field{
 
 using namespace std;
 
-int convn,testarg,skiparg;
+int convn,testarg,skiparg,skip;
 struct bsdconv_instance **convs;
+int *score;
+
+class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
+{
+	virtual TagLib::String parse( const TagLib::ByteVector &data ) const
+	{
+		int i,max;
+		struct bsdconv_instance *ins=NULL;
+		for(i=0;i<convn;++i){
+			ins=convs[i];
+			bsdconv_init(ins);
+			ins->output_mode=BSDCONV_HOLD;
+			ins->input.data=(void *)data.data();
+			ins->input.len=data.size();
+			ins->input.flags=0;
+			ins->flush=1;
+			bsdconv(ins);
+			score[i]=ins->score + ins->ierr*(-3) + ins->oerr*(-2);
+		}
+		max=0;
+		for(i=0;i<convn;++i){
+			if(score[i]>score[max]){
+				max=i;
+			}
+		}
+		ins=convs[max];
+		ins->output_mode=BSDCONV_AUTOMALLOC;
+		ins->output.len=1;
+		bsdconv(ins);
+		((char *)ins->output.data)[ins->output.len]=0;
+		if(ins->ierr || ins->oerr){
+			skip=1;
+		}else{
+			skip=0;
+		}
+		TagLib::String ret((const char *)ins->output.data, TagLib::String::UTF8);
+		free(ins->output.data);
+		return ret;
+	}
+	virtual TagLib::ByteVector render( const TagLib::String &s ) const
+	{
+		return TagLib::ByteVector("", 0);
+	}
+};
 
 const char * conv(TagLib::Tag *tag, int field){
-	int i;
 	const char *s=NULL;
-	struct bsdconv_instance *ins=NULL;
 	switch(field){
 		case TITLE:
 			s=tag->title().to8Bit(true).c_str();
@@ -40,26 +84,12 @@ const char * conv(TagLib::Tag *tag, int field){
 		case GENRE:
 			s=tag->genre().to8Bit(true).c_str();
 			break;
+		default:
+			return "";
 	}
-	for(i=0;i<convn;++i){
-		ins=convs[i];
-		bsdconv_init(ins);
-		ins->output_mode=BSDCONV_HOLD;
-		ins->input.data=(void *)s;
-		ins->input.len=strlen(s);
-		ins->input.flags=0;
-		ins->flush=1;
-		bsdconv(ins);
-		if(ins->ierr + ins->oerr==0){
-			ins->output_mode=BSDCONV_AUTOMALLOC;
-			ins->output.len=1;
-			bsdconv(ins);
-			((char *)ins->output.data)[ins->output.len]=0;
-			break;
-		}
-	}
-	TagLib::String res((const char *)ins->output.data, TagLib::String::UTF8);
-	if(i<convn || skiparg==0){
+	printf("%s\n",s);
+	TagLib::String res(s, TagLib::String::UTF8);
+	if(skip==0 || skiparg==0){
 		if(testarg==0){
 			switch(field){
 				case TITLE:
@@ -112,7 +142,7 @@ int main(int argc, char *argv[]){
 
 	//check
 	if(argc<3){
-		cerr << "Usage: bsdtagconv conversion[;conversion...] files" << endl;
+		cerr << "Usage: bsdtagconv from_conversion[;from_conversion...] [-i inter_conversion] files" << endl;
 		exit(1);
 	}
 
@@ -122,7 +152,8 @@ int main(int argc, char *argv[]){
 	for(c=convarg;*c;++c)
 		if(*c==';')
 			++convn;
-	convs=(struct bsdconv_instance **)malloc(sizeof(struct bsdconv_instance *));
+	convs=(struct bsdconv_instance **)malloc(sizeof(struct bsdconv_instance *)*convn);
+	score=(int *)malloc(sizeof(score)*convn);
 	c=convarg;
 	for(i=0;i<convn;++i){
 		t=strsep(&c, ";");
@@ -136,6 +167,7 @@ int main(int argc, char *argv[]){
 			free(convarg);
 			exit(1);
 		}
+//		bsdconv_insert_codec(convs[i], (char *)"NORMAL_SCORE", bsdconv_insert_phase(convs[i], INTER, 1), 0);
 	}
 	free(convarg);
 
@@ -152,6 +184,7 @@ int main(int argc, char *argv[]){
 		}
 	}
 
+	TagLib::ID3v1::Tag::setStringHandler( new ID3v1StringHandler() );
 	//proceed
 	for(i=argb;i<argc;++i){
 		cout << argv[i] << endl;
@@ -163,6 +196,7 @@ int main(int argc, char *argv[]){
 		bsdconv_destroy(convs[i]);
 	}
 	free(convs);
+	free(score);
 
 	if(testarg)
 		cerr << endl << "Use --notest to actually write the files" << endl;
