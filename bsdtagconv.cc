@@ -203,6 +203,9 @@ int main(int argc, char *argv[]){
 					cerr << "Failed create inter conversion instance: " << bsdconv_error() << endl;
 					exit(1);
 				}
+			}else{
+				cerr << "Missing argument for -i" << endl;
+				exit(1);
 			}
 		}else if(strcmp(argv[argb],"--")==0){
 			argb+=1;
