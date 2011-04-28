@@ -22,6 +22,7 @@ using namespace std;
 
 int convn,testarg,skiparg,skip;
 struct bsdconv_instance **convs;
+struct bsdconv_instance *inter;
 int *score;
 
 class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
@@ -86,7 +87,22 @@ TagLib::String conv(TagLib::Tag *tag, int field){
 		default:
 			return "";
 	}
-	//do inter conversion
+
+	if(inter){
+		TagLib::ByteVector bv(res.to8Bit(true).c_str());
+		bsdconv_init(inter);
+		inter->input.data=bv.data();
+		inter->input.len=bv.size();
+		inter->input.flags=0;
+		inter->flush=1;
+		inter->output_mode=BSDCONV_AUTOMALLOC;
+		inter->output.len=1;
+		bsdconv(inter);
+		((char *)inter->output.data)[inter->output.len]=0;
+		res=TagLib::String((const char *)inter->output.data, TagLib::String::UTF8);
+		free(inter->output.data);
+	}
+
 	if(skip==0 || skiparg==0){
 		if(testarg==0){
 			switch(field){
@@ -135,6 +151,8 @@ int main(int argc, char *argv[]){
 	int i,argb;
 	char *c, *t,*convarg;
 
+	inter=NULL;
+
 	testarg=1;
 	skiparg=1;
 
@@ -163,6 +181,7 @@ int main(int argc, char *argv[]){
 			}
 			free(convs);
 			free(convarg);
+			cerr << "Failed create conversion instance: " << bsdconv_error() << endl;
 			exit(1);
 		}
 		bsdconv_insert_codec(convs[i], (char *)"NORMAL_SCORE", bsdconv_insert_phase(convs[i], INTER, 1), 0);
@@ -174,6 +193,18 @@ int main(int argc, char *argv[]){
 			testarg=0;
 		}else if(strcmp(argv[argb],"--noskip")==0){
 			skiparg=0;
+		}else if(strcmp(argv[argb],"-i")==0){
+			if(argb+1<argc){
+				argb+=1;
+				if(NULL==(inter=bsdconv_create(argv[argb]))){
+					for(i=0;i<convn;++i){
+						bsdconv_destroy(convs[i]);
+					}
+					free(convs);
+					cerr << "Failed create inter conversion instance: " << bsdconv_error() << endl;
+					exit(1);
+				}
+			}
 		}else if(strcmp(argv[argb],"--")==0){
 			argb+=1;
 			break;
@@ -196,6 +227,8 @@ int main(int argc, char *argv[]){
 	}
 	free(convs);
 	free(score);
+	if(inter)
+		bsdconv_destroy(inter);
 
 	if(testarg)
 		cerr << endl << "Use --notest to actually write the files" << endl;
