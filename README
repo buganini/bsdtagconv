@@ -1,16 +1,12 @@
 NOTICE: THIS IS IN EARLY DEVELOPEMENT ! but it's safe without --notest
 
 Note:
-	Currently only works when taglib can correcly decode tag,
-	especially for id3v1, and conversion string needs to be ended with
-	utf-8,ascii.
-	Temporary solution: first use mid3iconv from audio/py-mutagen
-	(-e and --remove-v1)
+	Conversion string needs to be ended with utf-8,ascii.
 
 Example:
-	bsdtagconv 'utf-8,ascii:zhtw:zhtw_words:utf-8,ascii' blah.mp3
-	you can use multiple converions joined with ';', bsdtagconv will
-	use the one with no conversion failure.
+	bsdtagconv 'gbk,ascii:utf-8,ascii;big5,ascii:utf-8,ascii' -i utf-8,ascii:zhtw:zhtw_words:utf-8,ascii blah.mp3
+	argv[1] is ';' joined utf-8 ended conversion, for id3v1 decoding.
+	bsdtagconv will choose the best result.
 
 Dependencies:
 	bsdconv-4.9 (or 4.X && bsdconv.h fix for C++)
