@@ -3,6 +3,7 @@
 #include <string>
 #include <string.h>
 #include <taglib/tbytevector.h>
+#include <taglib/mpegfile.h>
 #include <taglib/id3v1tag.h>
 #include <taglib/id3v2tag.h>
 #include <taglib/fileref.h>
@@ -25,45 +26,41 @@ struct bsdconv_instance **convs;
 struct bsdconv_instance *inter;
 int *score;
 
-class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
-{
-	virtual TagLib::String parse( const TagLib::ByteVector &data ) const
-	{
-		int i,max;
-		struct bsdconv_instance *ins=NULL;
-		for(i=0;i<convn;++i){
-			ins=convs[i];
-			bsdconv_init(ins);
-			ins->output_mode=BSDCONV_HOLD;
-			ins->input.data=(void *)data.data();
-			ins->input.len=data.size();
-			ins->input.flags=0;
-			ins->flush=1;
-			bsdconv(ins);
-			score[i]=ins->score + ins->ierr*(-3) + ins->oerr*(-2);
-		}
-		max=0;
-		for(i=0;i<convn;++i){
-			if(score[i]>score[max]){
-				max=i;
-			}
-		}
-		ins=convs[max];
-		ins->output_mode=BSDCONV_AUTOMALLOC;
-		ins->output.len=1;
+TagLib::String autoconv(TagLib::String s){
+	TagLib::ByteVector bv(s.to8Bit(true).c_str());
+	int i,max;
+	struct bsdconv_instance *ins=NULL;
+	for(i=0;i<convn;++i){
+		ins=convs[i];
+		bsdconv_init(ins);
+		ins->output_mode=BSDCONV_HOLD;
+		ins->input.data=(void *)bv.data();
+		ins->input.len=bv.size();
+		ins->input.flags=0;
+		ins->flush=1;
 		bsdconv(ins);
-		((char *)ins->output.data)[ins->output.len]=0;
-		if(ins->ierr || ins->oerr){
-			skip=1;
-		}else{
-			skip=0;
-		}
-		TagLib::String ret((const char *)ins->output.data, TagLib::String::UTF8);
-		free(ins->output.data);
-		cout << ret.to8Bit(true) << endl;
-		return ret;
+		score[i]=ins->score + ins->ierr*(-3) + ins->oerr*(-2);
 	}
-};
+	max=0;
+	for(i=0;i<convn;++i){
+		if(score[i]>score[max]){
+			max=i;
+		}
+	}
+	ins=convs[max];
+	ins->output_mode=BSDCONV_AUTOMALLOC;
+	ins->output.len=1;
+	bsdconv(ins);
+	((char *)ins->output.data)[ins->output.len]=0;
+	if(ins->ierr || ins->oerr){
+		skip=1;
+	}else{
+		skip=0;
+	}
+	TagLib::String ret((const char *)ins->output.data, TagLib::String::UTF8);
+	free(ins->output.data);
+	return ret;
+}
 
 TagLib::String conv(TagLib::Tag *tag, int field){
 	TagLib::String res;
@@ -86,7 +83,9 @@ TagLib::String conv(TagLib::Tag *tag, int field){
 		default:
 			return "";
 	}
-	cout << res.to8Bit(true) << endl;
+	if(res.isLatin1()){
+		res=autoconv(res);
+	}
 	if(inter){
 		TagLib::ByteVector bv(res.to8Bit(true).c_str());
 		bsdconv_init(inter);
@@ -128,7 +127,7 @@ TagLib::String conv(TagLib::Tag *tag, int field){
 
 int proc(char *file){
 	TagLib::FileRef f(file);
-	if(!f.isNull() && f.tag()) {
+	if(!f.isNull() && f.tag()){
 		TagLib::Tag *tag = f.tag();
 		cout << "\ttitle   - \"" << conv(tag, TITLE).to8Bit(true).c_str()   << "\"" << endl;
 		cout << "\tartist  - \"" << conv(tag, ARTIST).to8Bit(true).c_str()  << "\"" << endl;
@@ -147,7 +146,7 @@ int proc(char *file){
 }
 
 int main(int argc, char *argv[]){
-	int i,argb;
+	int i,argb,p;
 	char *c, *t,*convarg;
 
 	inter=NULL;
@@ -183,7 +182,14 @@ int main(int argc, char *argv[]){
 			cerr << "Failed create conversion instance: " << bsdconv_error() << endl;
 			exit(1);
 		}
-		bsdconv_insert_codec(convs[i], (char *)"NORMAL_SCORE", bsdconv_insert_phase(convs[i], INTER, 1), 0);
+		p=bsdconv_insert_phase(convs[i], INTER, 1);
+		bsdconv_insert_codec(convs[i], (char *)"NORMAL_SCORE", p, 0);
+		p=bsdconv_insert_phase(convs[i], TO, 0);
+		bsdconv_insert_codec(convs[i], (char *)"ASCII", p, 0);
+		bsdconv_insert_codec(convs[i], (char *)"RAW", p, 0);
+		p=bsdconv_insert_phase(convs[i], FROM, 0);
+		bsdconv_insert_codec(convs[i], (char *)"ASCII", p, 0);
+		bsdconv_insert_codec(convs[i], (char *)"UTF-8", p, 0);
 	}
 	free(convarg);
 
@@ -214,8 +220,6 @@ int main(int argc, char *argv[]){
 			break;
 		}
 	}
-
-	TagLib::ID3v1::Tag::setStringHandler(new ID3v1StringHandler());
 
 	//proceed
 	for(i=argb;i<argc;++i){
