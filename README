@@ -9,7 +9,7 @@ Example:
 	bsdtagconv will choose the best result.
 
 Dependencies:
-	bsdconv-4.9 (or 4.X && bsdconv.h fix for C++)
+	bsdconv-5.0
 	audio/taglib (http://developer.kde.org/~wheeler/taglib.html)
 
 TODO:
