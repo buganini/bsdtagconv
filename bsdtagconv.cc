@@ -38,11 +38,39 @@ enum field{
 
 using namespace std;
 
-int convn,testarg,skiparg,skip,force_decode_id3v2;
+int convn;
+int testarg,skiparg,skip;
+int force_decode_all;
+int force_decode_ape;
+int force_decode_asf;
+int force_decode_id3v2;
+int force_decode_mp4;
+int force_decode_xiph;
+
 struct bsdconv_instance **convs;
 struct bsdconv_instance *inter;
 int *score;
 int bestCodec;
+
+class UniTag {
+	public:
+	TagLib::String title;
+	TagLib::String artist;
+	TagLib::String album;
+	TagLib::String comment;
+	TagLib::String genre;
+	TagLib::String rating;
+	TagLib::String copyright;
+	UniTag(){
+		title=TagLib::String::null;
+		artist=TagLib::String::null;
+		album=TagLib::String::null;
+		comment=TagLib::String::null;
+		genre=TagLib::String::null;
+		rating=TagLib::String::null;
+		copyright=TagLib::String::null;
+	}
+};
 
 void autoconv_init(){
 	int i;
@@ -100,7 +128,27 @@ TagLib::String autoconv(TagLib::String s){
 	return ret;
 }
 
-TagLib::String conv(TagLib::String res, const char *field){
+void autoConv(UniTag &U){
+	autoconv_init();
+
+	if(!U.title.isNull()) autoconv_test(U.title);
+	if(!U.artist.isNull()) autoconv_test(U.artist);
+	if(!U.album.isNull()) autoconv_test(U.album);
+	if(!U.comment.isNull()) autoconv_test(U.comment);
+	if(!U.genre.isNull()) autoconv_test(U.genre);
+	if(!U.rating.isNull()) autoconv_test(U.rating);
+	if(!U.copyright.isNull()) autoconv_test(U.copyright);
+
+	if(!U.title.isNull()) U.title=autoconv(U.title);
+	if(!U.artist.isNull()) U.artist=autoconv(U.artist);
+	if(!U.album.isNull()) U.album=autoconv(U.album);
+	if(!U.comment.isNull()) U.comment=autoconv(U.comment);
+	if(!U.genre.isNull()) U.genre=autoconv(U.genre);
+	if(!U.rating.isNull()) U.genre=autoconv(U.rating);
+	if(!U.copyright.isNull()) U.genre=autoconv(U.copyright);
+}
+
+TagLib::String conv(TagLib::String res){
 	TagLib::String ret=res;
 	if(inter){
 		TagLib::ByteVector bv(res.to8Bit(true).c_str());
@@ -119,11 +167,43 @@ TagLib::String conv(TagLib::String res, const char *field){
 	if(skip!=0 && skiparg!=0){
 		ret=res;
 	}
-	cout << "\t\t" << field << ": " << ret.to8Bit(true) << endl;
 	return ret;
+
+}
+
+void Conv(UniTag &U){
+	if(!U.title.isNull()){
+		U.title=conv(U.title);
+		cout << "\t\tTitle: " << U.title.to8Bit(true) << endl;
+	}
+	if(!U.artist.isNull()){
+		 U.artist=conv(U.artist);
+		cout << "\t\tArtist: " << U.artist.to8Bit(true) << endl;
+	}
+	if(!U.album.isNull()){
+		 U.album=conv(U.album);
+		cout << "\t\tAlbum: " << U.album.to8Bit(true) << endl;
+	}
+	if(!U.comment.isNull()){
+		 U.comment=conv(U.comment);
+		cout << "\t\tComment: " << U.comment.to8Bit(true) << endl;
+	}
+	if(!U.genre.isNull()){
+		 U.genre=conv(U.genre);
+		cout << "\t\tGenre: " << U.genre.to8Bit(true) << endl;
+	}
+	if(!U.rating.isNull()){
+		 U.genre=conv(U.rating);
+		cout << "\t\tRating: " << U.rating.to8Bit(true) << endl;
+	}
+	if(!U.copyright.isNull()){
+		 U.genre=conv(U.copyright);
+		cout << "\t\tCopyright: " << U.copyright.to8Bit(true) << endl;
+	}
 }
 
 int proc(char *file){
+	UniTag U;
 	TagLib::APE::Tag * APETag=NULL;
 	TagLib::ASF::Tag * ASFTag=NULL;
 	TagLib::ID3v1::Tag * ID3v1Tag=NULL;
@@ -182,88 +262,129 @@ int proc(char *file){
 		if(APETag==NULL && f.hasAPETag()){
 			cout << "\tAPE Tag:" << endl;
 			APETag=f.APETag(false);
-			APETag->setTitle(conv(APETag->title(),"Title"));
-			APETag->setArtist(conv(APETag->artist(),"Artist"));
-			APETag->setAlbum(conv(APETag->album(),"Album"));
-			APETag->setComment(conv(APETag->comment(),"Comment"));
-			APETag->setGenre(conv(APETag->genre(),"Genre"));
+			U=UniTag::UniTag();
+			U.title=APETag->title();
+			U.artist=APETag->artist();
+			U.album=APETag->album();
+			U.comment=APETag->comment();
+			U.genre=APETag->genre();
+			if(force_decode_ape)
+				autoConv(U);
+			APETag->setTitle(U.title);
+			APETag->setArtist(U.artist);
+			APETag->setAlbum(U.album);
+			APETag->setComment(U.comment);
+			APETag->setGenre(U.genre);
 		}
 		if(ASFTag==NULL && f.hasASFTag()){
 			cout << "\tASF Tag:" << endl;
 			ASFTag=f.ASFTag(false);
-			ASFTag->setTitle(conv(ASFTag->title(),"Title"));
-			ASFTag->setArtist(conv(ASFTag->artist(),"Artist"));
-			ASFTag->setAlbum(conv(ASFTag->album(),"Album"));
-			ASFTag->setComment(conv(ASFTag->comment(),"Comment"));
-			ASFTag->setGenre(conv(ASFTag->genre(),"Genre"));
-			ASFTag->setRating(conv(ASFTag->rating(),"Rating"));
-			ASFTag->setCopyright(conv(ASFTag->copyright(),"Copyright"));
+			U=UniTag::UniTag();
+			U.title=ASFTag->title();
+			U.artist=ASFTag->artist();
+			U.album=ASFTag->album();
+			U.comment=ASFTag->comment();
+			U.genre=ASFTag->genre();
+			U.genre=ASFTag->rating();
+			U.genre=ASFTag->copyright();
+			if(force_decode_asf)
+				autoConv(U);
+			ASFTag->setTitle(U.title);
+			ASFTag->setArtist(U.artist);
+			ASFTag->setAlbum(U.album);
+			ASFTag->setComment(U.comment);
+			ASFTag->setGenre(U.genre);
+			ASFTag->setRating(U.rating);
+			ASFTag->setCopyright(U.copyright);
 		}
 		if(ID3v1Tag==NULL && f.hasID3v1Tag()){
 			cout << "\tID3v1 Tag:" << endl;
 			ID3v1Tag=f.ID3v1Tag(false);
-			autoconv_init();
-			autoconv_test(ID3v1Tag->title());
-			autoconv_test(ID3v1Tag->artist());
-			autoconv_test(ID3v1Tag->album());
-			autoconv_test(ID3v1Tag->comment());
-			autoconv_test(ID3v1Tag->genre());
-			ID3v1Tag->setTitle(conv(autoconv(ID3v1Tag->title()),"Title"));
-			ID3v1Tag->setArtist(conv(autoconv(ID3v1Tag->artist()),"Artist"));
-			ID3v1Tag->setAlbum(conv(autoconv(ID3v1Tag->album()),"Album"));
-			ID3v1Tag->setComment(conv(autoconv(ID3v1Tag->comment()),"Comment"));
-			ID3v1Tag->setGenre(conv(autoconv(ID3v1Tag->genre()),"Genre"));
+			U=UniTag::UniTag();
+			U.title=ID3v1Tag->title();
+			U.artist=ID3v1Tag->artist();
+			U.album=ID3v1Tag->album();
+			U.comment=ID3v1Tag->comment();
+			U.genre=ID3v1Tag->genre();
+			autoConv(U);
+			Conv(U);
+			ID3v1Tag->setTitle(U.title);
+			ID3v1Tag->setArtist(U.artist);
+			ID3v1Tag->setAlbum(U.album);
+			ID3v1Tag->setComment(U.comment);
+			ID3v1Tag->setGenre(U.genre);
 		}
 		if(ID3v2Tag==NULL && f.hasID3v2Tag()){
 			cout << "\tID3v2 Tag:" << endl;
 			ID3v2Tag=f.ID3v2Tag(false);
-			if(force_decode_id3v2){
-				autoconv_init();
-				autoconv_test(ID3v2Tag->title());
-				autoconv_test(ID3v2Tag->artist());
-				autoconv_test(ID3v2Tag->album());
-				autoconv_test(ID3v2Tag->comment());
-				autoconv_test(ID3v2Tag->genre());
-				ID3v2Tag->setTitle(conv(autoconv(ID3v2Tag->title()),"Title"));
-				ID3v2Tag->setArtist(conv(autoconv(ID3v2Tag->artist()),"Artist"));
-				ID3v2Tag->setAlbum(conv(autoconv(ID3v2Tag->album()),"Album"));
-				ID3v2Tag->setComment(conv(autoconv(ID3v2Tag->comment()),"Comment"));
-				ID3v2Tag->setGenre(conv(autoconv(ID3v2Tag->genre()),"Genre"));
-
-			}else{
-				ID3v2Tag->setTitle(conv(ID3v2Tag->title(),"Title"));
-				ID3v2Tag->setArtist(conv(ID3v2Tag->artist(),"Artist"));
-				ID3v2Tag->setAlbum(conv(ID3v2Tag->album(),"Album"));
-				ID3v2Tag->setComment(conv(ID3v2Tag->comment(),"Comment"));
-				ID3v2Tag->setGenre(conv(ID3v2Tag->genre(),"Genre"));
-			}
+			U=UniTag::UniTag();
+			U.title=ID3v2Tag->title();
+			U.artist=ID3v2Tag->artist();
+			U.album=ID3v2Tag->album();
+			U.comment=ID3v2Tag->comment();
+			U.genre=ID3v2Tag->genre();
+			if(force_decode_id3v2)
+				autoConv(U);
+			Conv(U);
+			ID3v2Tag->setTitle(U.title);
+			ID3v2Tag->setArtist(U.artist);
+			ID3v2Tag->setAlbum(U.album);
+			ID3v2Tag->setComment(U.comment);
+			ID3v2Tag->setGenre(U.genre);
 		}
 		if(MP4Tag==NULL && f.hasMP4Tag()){
 			cout << "\tMP4 Tag:" << endl;
 			MP4Tag=f.MP4Tag(false);
-			MP4Tag->setTitle(conv(MP4Tag->title(),"Title"));
-			MP4Tag->setArtist(conv(MP4Tag->artist(),"Artist"));
-			MP4Tag->setAlbum(conv(MP4Tag->album(),"Album"));
-			MP4Tag->setComment(conv(MP4Tag->comment(),"Comment"));
-			MP4Tag->setGenre(conv(MP4Tag->genre(),"Genre"));
+			U=UniTag::UniTag();
+			U.title=MP4Tag->title();
+			U.artist=MP4Tag->artist();
+			U.album=MP4Tag->album();
+			U.comment=MP4Tag->comment();
+			U.genre=MP4Tag->genre();
+			if(force_decode_mp4)
+				autoConv(U);
+			Conv(U);
+			MP4Tag->setTitle(U.title);
+			MP4Tag->setArtist(U.artist);
+			MP4Tag->setAlbum(U.album);
+			MP4Tag->setComment(U.comment);
+			MP4Tag->setGenre(U.genre);
 		}
 		if(XiphComment==NULL && f.hasXiphComment()){
 			cout << "\tXiphComment Tag:" << endl;
 			XiphComment=f.XiphComment(false);
-			XiphComment->setTitle(conv(XiphComment->title(),"Title"));
-			XiphComment->setArtist(conv(XiphComment->artist(),"Artist"));
-			XiphComment->setAlbum(conv(XiphComment->album(),"Album"));
-			XiphComment->setComment(conv(XiphComment->comment(),"Comment"));
-			XiphComment->setGenre(conv(XiphComment->genre(),"Genre"));
+			U=UniTag::UniTag();
+			U.title=XiphComment->title();
+			U.artist=XiphComment->artist();
+			U.album=XiphComment->album();
+			U.comment=XiphComment->comment();
+			U.genre=XiphComment->genre();
+			if(force_decode_xiph)
+				autoConv(U);
+			Conv(U);
+			XiphComment->setTitle(U.title);
+			XiphComment->setArtist(U.artist);
+			XiphComment->setAlbum(U.album);
+			XiphComment->setComment(U.comment);
+			XiphComment->setGenre(U.genre);
 		}
 		if(f.hasTag()){
 			cout << "\tTag:" << endl;
 			Tag=f.tag();
-			Tag->setTitle(conv(Tag->title(),"Title"));
-			Tag->setArtist(conv(Tag->artist(),"Artist"));
-			Tag->setAlbum(conv(Tag->album(),"Album"));
-			Tag->setComment(conv(Tag->comment(),"Comment"));
-			Tag->setGenre(conv(Tag->genre(),"Genre"));
+			U=UniTag::UniTag();
+			U.title=Tag->title();
+			U.artist=Tag->artist();
+			U.album=Tag->album();
+			U.comment=Tag->comment();
+			U.genre=Tag->genre();
+			if(force_decode_all)
+				autoConv(U);
+			Conv(U);
+			Tag->setTitle(U.title);
+			Tag->setArtist(U.artist);
+			Tag->setAlbum(U.album);
+			Tag->setComment(U.comment);
+			Tag->setGenre(U.genre);
 		}
 
 	}else{
@@ -283,13 +404,23 @@ int main(int argc, char *argv[]){
 
 	testarg=1;
 	skiparg=1;
+	force_decode_all=0;
+	force_decode_ape=0;
+	force_decode_asf=0;
 	force_decode_id3v2=0;
+	force_decode_mp4=0;
+	force_decode_xiph=0;
 
 	//check
 	if(argc<3){
 		cerr << "Usage: bsdtagconv from_conversion[;from_conversion...] [-i inter_conversion] [options..] files" << endl;
 		cerr << "Options:" << endl;
-		cerr << "\t--force-decode-id3v2: decode ID3v2 as ID3v1" << endl;
+		cerr << "\t--force-decode-all: Decode tag(s) as ID3v1" << endl;
+		cerr << "\t--force-decode-ape:" << endl;
+		cerr << "\t--force-decode-asf:" << endl;
+		cerr << "\t--force-decode-id3v2:" << endl;
+		cerr << "\t--force-decode-mp4:" << endl;
+		cerr << "\t--force-decode-xiph:" << endl;
 		exit(1);
 	}
 
@@ -331,8 +462,23 @@ int main(int argc, char *argv[]){
 			testarg=0;
 		}else if(strcmp(argv[argb],"--noskip")==0){
 			skiparg=0;
+		}else if(strcmp(argv[argb],"--force-decode-all")==0){
+			force_decode_all=1;
+			force_decode_ape=1;
+			force_decode_asf=1;
+			force_decode_id3v2=1;
+			force_decode_mp4=1;
+			force_decode_xiph=1;
+		}else if(strcmp(argv[argb],"--force-decode-ape")==0){
+			force_decode_ape=1;
+		}else if(strcmp(argv[argb],"--force-decode-asf")==0){
+			force_decode_asf=1;
 		}else if(strcmp(argv[argb],"--force-decode-id3v2")==0){
 			force_decode_id3v2=1;
+		}else if(strcmp(argv[argb],"--force-decode-mp4")==0){
+			force_decode_mp4=1;
+		}else if(strcmp(argv[argb],"--force-decode-xiph")==0){
+			force_decode_xiph=1;
 		}else if(strcmp(argv[argb],"-i")==0){
 			if(argb+1<argc){
 				argb+=1;
