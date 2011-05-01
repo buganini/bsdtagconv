@@ -39,7 +39,7 @@ enum field{
 using namespace std;
 
 int convn;
-int testarg,skiparg,skip,autoarg;
+int testarg,skiparg,skip,autoarg,eachconv;
 int force_decode_all;
 int force_decode_ape;
 int force_decode_asf;
@@ -144,23 +144,54 @@ int score_eval(TagLib::String s){
 }
 
 void autoConv(UniTag &U){
-	autoconv_init();
+	if(eachconv){
+		autoconv_init();
+		if(!U.title.isNull()) autoconv_test(U.title);
+		if(!U.title.isNull()) U.title=autoconv(U.title);
 
-	if(!U.title.isNull()) autoconv_test(U.title);
-	if(!U.artist.isNull()) autoconv_test(U.artist);
-	if(!U.album.isNull()) autoconv_test(U.album);
-	if(!U.comment.isNull()) autoconv_test(U.comment);
-	if(!U.genre.isNull()) autoconv_test(U.genre);
-	if(!U.rating.isNull()) autoconv_test(U.rating);
-	if(!U.copyright.isNull()) autoconv_test(U.copyright);
+		autoconv_init();
+		if(!U.artist.isNull()) autoconv_test(U.artist);
+		if(!U.artist.isNull()) U.artist=autoconv(U.artist);
 
-	if(!U.title.isNull()) U.title=autoconv(U.title);
-	if(!U.artist.isNull()) U.artist=autoconv(U.artist);
-	if(!U.album.isNull()) U.album=autoconv(U.album);
-	if(!U.comment.isNull()) U.comment=autoconv(U.comment);
-	if(!U.genre.isNull()) U.genre=autoconv(U.genre);
-	if(!U.rating.isNull()) U.genre=autoconv(U.rating);
-	if(!U.copyright.isNull()) U.genre=autoconv(U.copyright);
+		autoconv_init();
+		if(!U.album.isNull()) autoconv_test(U.album);
+		if(!U.album.isNull()) U.album=autoconv(U.album);
+
+		autoconv_init();
+		if(!U.comment.isNull()) autoconv_test(U.comment);
+		if(!U.comment.isNull()) U.comment=autoconv(U.comment);
+
+		autoconv_init();
+		if(!U.genre.isNull()) autoconv_test(U.genre);
+		if(!U.genre.isNull()) U.genre=autoconv(U.genre);
+
+		autoconv_init();
+		if(!U.rating.isNull()) autoconv_test(U.rating);
+		if(!U.rating.isNull()) U.genre=autoconv(U.rating);
+
+		autoconv_init();
+		if(!U.copyright.isNull()) autoconv_test(U.copyright);
+		if(!U.copyright.isNull()) U.genre=autoconv(U.copyright);
+
+	}else{
+		autoconv_init();
+
+		if(!U.title.isNull()) autoconv_test(U.title);
+		if(!U.artist.isNull()) autoconv_test(U.artist);
+		if(!U.album.isNull()) autoconv_test(U.album);
+		if(!U.comment.isNull()) autoconv_test(U.comment);
+		if(!U.genre.isNull()) autoconv_test(U.genre);
+		if(!U.rating.isNull()) autoconv_test(U.rating);
+		if(!U.copyright.isNull()) autoconv_test(U.copyright);
+
+		if(!U.title.isNull()) U.title=autoconv(U.title);
+		if(!U.artist.isNull()) U.artist=autoconv(U.artist);
+		if(!U.album.isNull()) U.album=autoconv(U.album);
+		if(!U.comment.isNull()) U.comment=autoconv(U.comment);
+		if(!U.genre.isNull()) U.genre=autoconv(U.genre);
+		if(!U.rating.isNull()) U.genre=autoconv(U.rating);
+		if(!U.copyright.isNull()) U.genre=autoconv(U.copyright);
+	}
 }
 
 TagLib::String conv(TagLib::String res){
@@ -428,6 +459,7 @@ int main(int argc, char *argv[]){
 	inter=NULL;
 
 	autoarg=0;
+	eachconv=0;
 	testarg=1;
 	skiparg=1;
 	force_decode_all=0;
@@ -444,6 +476,7 @@ int main(int argc, char *argv[]){
 		cerr << "\t--notest: Write files" << endl;
 		cerr << "\t--noskip: Use conversion results with failure" << endl;
 		cerr << "\t--auto: Merge all tags with selectng the best data" << endl;
+		cerr << "\t--each-conv: Don't assume all fields use the same encoding" << endl;
 		cerr << "\t--force-decode-all: Decode tag(s) as ID3v1" << endl;
 		cerr << "\t--force-decode-ape:" << endl;
 		cerr << "\t--force-decode-asf:" << endl;
@@ -498,6 +531,8 @@ int main(int argc, char *argv[]){
 			skiparg=0;
 		}else if(strcmp(argv[argb],"--auto")==0){
 			autoarg=1;
+		}else if(strcmp(argv[argb],"--each-conv")==0){
+			eachconv=1;
 		}else if(strcmp(argv[argb],"--force-decode-all")==0){
 			force_decode_all=1;
 			force_decode_ape=1;
