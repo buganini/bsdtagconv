@@ -147,31 +147,31 @@ int proc(char *file){
 			case TagLib::Type::ASF:
 				cout << "preferedType: ASF" << endl;
 				if(!f.hasASFTag()){
-
+					ASFTag=f.ASFTag(true);
 				}
 				break;
 			case TagLib::Type::ID3v1:
 				cout << "preferedType: ID3v1" << endl;
 				if(!f.hasID3v1Tag()){
-
+					ID3v1Tag=f.ID3v1Tag(true);
 				}
 				break;
 			case TagLib::Type::ID3v2:
 				cout << "preferedType: ID3v2" << endl;
 				if(!f.hasID3v2Tag()){
-
+					ID3v2Tag=f.ID3v2Tag(true);
 				}
 				break;
 			case TagLib::Type::MP4:
 				cout << "preferedType: MP4" << endl;
 				if(!f.hasMP4Tag()){
-
+					MP4Tag=f.MP4Tag(true);
 				}
 				break;
 			case TagLib::Type::XiphComment:
 				cout << "preferedType: XiphComment" << endl;
 				if(!f.hasXiphComment()){
-
+					XiphComment=f.XiphComment(true);
 				}
 				break;
 			default:
