@@ -19,6 +19,12 @@
 #include <taglib/tbytevector.h>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
+#include <taglib/apetag.h>
+#include <taglib/asftag.h>
+#include <taglib/id3v1tag.h>
+#include <taglib/id3v2tag.h>
+#include <taglib/mp4tag.h>
+#include <taglib/xiphcomment.h>
 #include <taglib/tstring.h>
 #include <bsdconv.h>
 
@@ -73,30 +79,8 @@ TagLib::String autoconv(TagLib::String s){
 	return ret;
 }
 
-TagLib::String conv(TagLib::Tag *tag, int field){
-	TagLib::String res;
-	switch(field){
-		case TITLE:
-			res=tag->title();
-			break;
-		case ARTIST:
-			res=tag->artist();
-			break;
-		case ALBUM:
-			res=tag->album();
-			break;
-		case COMMENT:
-			res=tag->comment();
-			break;
-		case GENRE:
-			res=tag->genre();
-			break;
-		default:
-			return "";
-	}
-	if(res.isLatin1()){
-		res=autoconv(res);
-	}
+TagLib::String conv(TagLib::String res, const char *field){
+	TagLib::String ret=res;
 	if(inter){
 		TagLib::ByteVector bv(res.to8Bit(true).c_str());
 		bsdconv_init(inter);
@@ -108,45 +92,138 @@ TagLib::String conv(TagLib::Tag *tag, int field){
 		inter->output.len=1;
 		bsdconv(inter);
 		((char *)inter->output.data)[inter->output.len]=0;
-		res=TagLib::String((const char *)inter->output.data, TagLib::String::UTF8);
+		ret=TagLib::String((const char *)inter->output.data, TagLib::String::UTF8);
 		free(inter->output.data);
 	}
-
-	if(skip==0 || skiparg==0){
-		if(testarg==0){
-			switch(field){
-				case TITLE:
-					tag->setTitle(res);
-					break;
-				case ARTIST:
-					tag->setArtist(res);
-					break;
-				case ALBUM:
-					tag->setAlbum(res);
-					break;
-				case COMMENT:
-					tag->setComment(res);
-					break;
-				case GENRE:
-					tag->setGenre(res);
-					break;
-			}
-		}
+	if(skip!=0 && skiparg!=0){
+		ret=res;
 	}
-	return res;
+	cout << "\t\t" << field << ": " << ret.to8Bit(true) << endl;
+	return ret;
 }
 
 int proc(char *file){
+	TagLib::APE::Tag * APETag=NULL;
+	TagLib::ASF::Tag * ASFTag=NULL;
+	TagLib::ID3v1::Tag * ID3v1Tag=NULL;
+	TagLib::ID3v2::Tag * ID3v2Tag=NULL;
+	TagLib::MP4::Tag * MP4Tag=NULL;
+	TagLib::Ogg::XiphComment * XiphComment=NULL;
+	TagLib::Tag * Tag=NULL;
 	TagLib::FileRef f(file);
-	if(!f.isNull() && f.tag()){
-		TagLib::Tag *tag = f.tag();
-		cout << "\ttitle   - \"" << conv(tag, TITLE).to8Bit(true).c_str()   << "\"" << endl;
-		cout << "\tartist  - \"" << conv(tag, ARTIST).to8Bit(true).c_str()  << "\"" << endl;
-		cout << "\talbum   - \"" << conv(tag, ALBUM).to8Bit(true).c_str()   << "\"" << endl;
-		cout << "\tyear    - \"" << tag->year()    << "\"" << endl;
-		cout << "\tcomment - \"" << conv(tag, COMMENT).to8Bit(true).c_str() << "\"" << endl;
-		cout << "\ttrack   - \"" << tag->track()   << "\"" << endl;
-		cout << "\tgenre   - \"" << conv(tag, GENRE).to8Bit(true).c_str()   << "\"" << endl;
+	if(!f.isNull()){
+		cout << file << "  ";
+		switch(f.preferedType()){
+			case TagLib::Type::None:
+				cout << "preferedType: None" << endl;
+				break;
+			case TagLib::Type::APE:
+				cout << "preferedType: APE" << endl;
+				if(!f.hasAPETag()){
+					APETag=f.APETag(true);
+				}
+				break;
+			case TagLib::Type::ASF:
+				cout << "preferedType: ASF" << endl;
+				if(!f.hasASFTag()){
+
+				}
+				break;
+			case TagLib::Type::ID3v1:
+				cout << "preferedType: ID3v1" << endl;
+				if(!f.hasID3v1Tag()){
+
+				}
+				break;
+			case TagLib::Type::ID3v2:
+				cout << "preferedType: ID3v2" << endl;
+				if(!f.hasID3v2Tag()){
+
+				}
+				break;
+			case TagLib::Type::MP4:
+				cout << "preferedType: MP4" << endl;
+				if(!f.hasMP4Tag()){
+
+				}
+				break;
+			case TagLib::Type::XiphComment:
+				cout << "preferedType: XiphComment" << endl;
+				if(!f.hasXiphComment()){
+
+				}
+				break;
+			default:
+				cerr << "problematic preferedType" << endl;
+				exit(1);
+				break;
+		}
+		if(APETag==NULL && f.hasAPETag()){
+			cout << "\tAPE Tag:" << endl;
+			APETag=f.APETag(false);
+			APETag->setTitle(conv(APETag->title(),"Title"));
+			APETag->setArtist(conv(APETag->artist(),"Artist"));
+			APETag->setAlbum(conv(APETag->album(),"Album"));
+			APETag->setComment(conv(APETag->comment(),"Comment"));
+			APETag->setGenre(conv(APETag->genre(),"Genre"));
+		}
+		if(ASFTag==NULL && f.hasASFTag()){
+			cout << "\tASF Tag:" << endl;
+			ASFTag=f.ASFTag(false);
+			ASFTag->setTitle(conv(ASFTag->title(),"Title"));
+			ASFTag->setArtist(conv(ASFTag->artist(),"Artist"));
+			ASFTag->setAlbum(conv(ASFTag->album(),"Album"));
+			ASFTag->setComment(conv(ASFTag->comment(),"Comment"));
+			ASFTag->setGenre(conv(ASFTag->genre(),"Genre"));
+			ASFTag->setRating(conv(ASFTag->rating(),"Rating"));
+			ASFTag->setCopyright(conv(ASFTag->copyright(),"Copyright"));
+		}
+		if(ID3v1Tag==NULL && f.hasID3v1Tag()){
+			cout << "\tID3v1 Tag:" << endl;
+			ID3v1Tag=f.ID3v1Tag(false);
+			ID3v1Tag->setTitle(conv(autoconv(ID3v1Tag->title()),"Title"));
+			ID3v1Tag->setArtist(conv(autoconv(ID3v1Tag->artist()),"Artist"));
+			ID3v1Tag->setAlbum(conv(autoconv(ID3v1Tag->album()),"Album"));
+			ID3v1Tag->setComment(conv(autoconv(ID3v1Tag->comment()),"Comment"));
+			ID3v1Tag->setGenre(conv(autoconv(ID3v1Tag->genre()),"Genre"));
+		}
+		if(ID3v2Tag==NULL && f.hasID3v2Tag()){
+			cout << "\tID3v2 Tag:" << endl;
+			ID3v2Tag=f.ID3v2Tag(false);
+			ID3v2Tag->setTitle(conv(ID3v2Tag->title(),"Title"));
+			ID3v2Tag->setArtist(conv(ID3v2Tag->artist(),"Artist"));
+			ID3v2Tag->setAlbum(conv(ID3v2Tag->album(),"Album"));
+			ID3v2Tag->setComment(conv(ID3v2Tag->comment(),"Comment"));
+			ID3v2Tag->setGenre(conv(ID3v2Tag->genre(),"Genre"));
+		}
+		if(MP4Tag==NULL && f.hasMP4Tag()){
+			cout << "\tMP4 Tag:" << endl;
+			MP4Tag=f.MP4Tag(false);
+			MP4Tag->setTitle(conv(MP4Tag->title(),"Title"));
+			MP4Tag->setArtist(conv(MP4Tag->artist(),"Artist"));
+			MP4Tag->setAlbum(conv(MP4Tag->album(),"Album"));
+			MP4Tag->setComment(conv(MP4Tag->comment(),"Comment"));
+			MP4Tag->setGenre(conv(MP4Tag->genre(),"Genre"));
+		}
+		if(XiphComment==NULL && f.hasXiphComment()){
+			cout << "\tXiphComment Tag:" << endl;
+			XiphComment=f.XiphComment(false);
+			XiphComment->setTitle(conv(XiphComment->title(),"Title"));
+			XiphComment->setArtist(conv(XiphComment->artist(),"Artist"));
+			XiphComment->setAlbum(conv(XiphComment->album(),"Album"));
+			XiphComment->setComment(conv(XiphComment->comment(),"Comment"));
+			XiphComment->setGenre(conv(XiphComment->genre(),"Genre"));
+		}
+		if(f.hasTag()){
+			cout << "\tTag:" << endl;
+			Tag=f.tag();
+			Tag->setTitle(conv(Tag->title(),"Title"));
+			Tag->setArtist(conv(Tag->artist(),"Artist"));
+			Tag->setAlbum(conv(Tag->album(),"Album"));
+			Tag->setComment(conv(Tag->comment(),"Comment"));
+			Tag->setGenre(conv(Tag->genre(),"Genre"));
+		}
+
 	}else{
 		return 0;
 	}
@@ -234,7 +311,6 @@ int main(int argc, char *argv[]){
 
 	//proceed
 	for(i=argb;i<argc;++i){
-		cout << argv[i] << endl;
 		proc(argv[i]);
 	}
 
