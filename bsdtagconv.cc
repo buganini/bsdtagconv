@@ -38,7 +38,7 @@ enum field{
 
 using namespace std;
 
-int convn,testarg,skiparg,skip;
+int convn,testarg,skiparg,skip,force_decode_id3v2;
 struct bsdconv_instance **convs;
 struct bsdconv_instance *inter;
 int *score;
@@ -217,11 +217,26 @@ int proc(char *file){
 		if(ID3v2Tag==NULL && f.hasID3v2Tag()){
 			cout << "\tID3v2 Tag:" << endl;
 			ID3v2Tag=f.ID3v2Tag(false);
-			ID3v2Tag->setTitle(conv(ID3v2Tag->title(),"Title"));
-			ID3v2Tag->setArtist(conv(ID3v2Tag->artist(),"Artist"));
-			ID3v2Tag->setAlbum(conv(ID3v2Tag->album(),"Album"));
-			ID3v2Tag->setComment(conv(ID3v2Tag->comment(),"Comment"));
-			ID3v2Tag->setGenre(conv(ID3v2Tag->genre(),"Genre"));
+			if(force_decode_id3v2){
+				autoconv_init();
+				autoconv_test(ID3v2Tag->title());
+				autoconv_test(ID3v2Tag->artist());
+				autoconv_test(ID3v2Tag->album());
+				autoconv_test(ID3v2Tag->comment());
+				autoconv_test(ID3v2Tag->genre());
+				ID3v2Tag->setTitle(conv(autoconv(ID3v2Tag->title()),"Title"));
+				ID3v2Tag->setArtist(conv(autoconv(ID3v2Tag->artist()),"Artist"));
+				ID3v2Tag->setAlbum(conv(autoconv(ID3v2Tag->album()),"Album"));
+				ID3v2Tag->setComment(conv(autoconv(ID3v2Tag->comment()),"Comment"));
+				ID3v2Tag->setGenre(conv(autoconv(ID3v2Tag->genre()),"Genre"));
+
+			}else{
+				ID3v2Tag->setTitle(conv(ID3v2Tag->title(),"Title"));
+				ID3v2Tag->setArtist(conv(ID3v2Tag->artist(),"Artist"));
+				ID3v2Tag->setAlbum(conv(ID3v2Tag->album(),"Album"));
+				ID3v2Tag->setComment(conv(ID3v2Tag->comment(),"Comment"));
+				ID3v2Tag->setGenre(conv(ID3v2Tag->genre(),"Genre"));
+			}
 		}
 		if(MP4Tag==NULL && f.hasMP4Tag()){
 			cout << "\tMP4 Tag:" << endl;
@@ -268,10 +283,13 @@ int main(int argc, char *argv[]){
 
 	testarg=1;
 	skiparg=1;
+	force_decode_id3v2=0;
 
 	//check
 	if(argc<3){
-		cerr << "Usage: bsdtagconv from_conversion[;from_conversion...] [-i inter_conversion] files" << endl;
+		cerr << "Usage: bsdtagconv from_conversion[;from_conversion...] [-i inter_conversion] [options..] files" << endl;
+		cerr << "Options:" << endl;
+		cerr << "\t--force-decode-id3v2: decode ID3v2 as ID3v1" << endl;
 		exit(1);
 	}
 
@@ -313,6 +331,8 @@ int main(int argc, char *argv[]){
 			testarg=0;
 		}else if(strcmp(argv[argb],"--noskip")==0){
 			skiparg=0;
+		}else if(strcmp(argv[argb],"--force-decode-id3v2")==0){
+			force_decode_id3v2=1;
 		}else if(strcmp(argv[argb],"-i")==0){
 			if(argb+1<argc){
 				argb+=1;
