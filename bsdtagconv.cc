@@ -42,8 +42,17 @@ int convn,testarg,skiparg,skip;
 struct bsdconv_instance **convs;
 struct bsdconv_instance *inter;
 int *score;
+int bestCodec;
 
-TagLib::String autoconv(TagLib::String s){
+void autoconv_init(){
+	int i;
+	for(i=0;i<convn;++i){
+		score[i]=0;
+	}
+}
+
+
+void autoconv_test(TagLib::String s){
 	TagLib::ByteVector bv(s.to8Bit(true).c_str());
 	int i,max;
 	struct bsdconv_instance *ins=NULL;
@@ -56,7 +65,7 @@ TagLib::String autoconv(TagLib::String s){
 		ins->input.flags=0;
 		ins->flush=1;
 		bsdconv(ins);
-		score[i]=ins->score + ins->ierr*(-3) + ins->oerr*(-2);
+		score[i]+=ins->score + ins->ierr*(-3) + ins->oerr*(-2);
 	}
 	max=0;
 	for(i=0;i<convn;++i){
@@ -64,7 +73,19 @@ TagLib::String autoconv(TagLib::String s){
 			max=i;
 		}
 	}
-	ins=convs[max];
+	bestCodec=max;
+}
+
+TagLib::String autoconv(TagLib::String s){
+	TagLib::ByteVector bv(s.to8Bit(true).c_str());
+	struct bsdconv_instance *ins=NULL;
+
+	ins=convs[bestCodec];
+	bsdconv_init(ins);
+	ins->input.data=(void *)bv.data();
+	ins->input.len=bv.size();
+	ins->input.flags=0;
+	ins->flush=1;
 	ins->output_mode=BSDCONV_AUTOMALLOC;
 	ins->output.len=1;
 	bsdconv(ins);
@@ -181,6 +202,12 @@ int proc(char *file){
 		if(ID3v1Tag==NULL && f.hasID3v1Tag()){
 			cout << "\tID3v1 Tag:" << endl;
 			ID3v1Tag=f.ID3v1Tag(false);
+			autoconv_init();
+			autoconv_test(ID3v1Tag->title());
+			autoconv_test(ID3v1Tag->artist());
+			autoconv_test(ID3v1Tag->album());
+			autoconv_test(ID3v1Tag->comment());
+			autoconv_test(ID3v1Tag->genre());
 			ID3v1Tag->setTitle(conv(autoconv(ID3v1Tag->title()),"Title"));
 			ID3v1Tag->setArtist(conv(autoconv(ID3v1Tag->artist()),"Artist"));
 			ID3v1Tag->setAlbum(conv(autoconv(ID3v1Tag->album()),"Album"));
