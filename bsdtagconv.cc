@@ -501,7 +501,7 @@ int main(int argc, char *argv[]){
 		cerr << "\t--notest: Write files" << endl;
 		cerr << "\t--noskip: Use conversion results with failure" << endl;
 		cerr << "\t--auto: Merge all tags with selectng the best data and write into prefered tag" << endl;
-		cerr << "\t--strip: (with --auto) Remove all tags before writing prefered tag" << endl;
+		cerr << "\t--strip: (require --auto) Remove all tags before writing prefered tag" << endl;
 		cerr << "\t--each-conv: Don't assume all fields use the same encoding" << endl;
 		cerr << "\t--force-decode-all: Decode tag(s) as ID3v1" << endl;
 		cerr << "\t--force-decode-ape:" << endl;
