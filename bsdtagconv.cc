@@ -39,7 +39,7 @@ enum field{
 using namespace std;
 
 int convn;
-int testarg,skiparg,skip,autoarg,eachconv;
+int testarg,skiparg,skip,autoarg,eachconv,strip;
 int force_decode_all;
 int force_decode_ape;
 int force_decode_asf;
@@ -258,52 +258,7 @@ int proc(char *file){
 	TagLib::Tag * Tag=NULL;
 	TagLib::FileRef f(file);
 	if(!f.isNull()){
-		cout << file << "  ";
-		switch(f.preferedType()){
-			case TagLib::Type::None:
-				cout << "preferedType: None" << endl;
-				break;
-			case TagLib::Type::APE:
-				cout << "preferedType: APE" << endl;
-				if(!f.hasAPETag()){
-					APETag=f.APETag(true);
-				}
-				break;
-			case TagLib::Type::ASF:
-				cout << "preferedType: ASF" << endl;
-				if(!f.hasASFTag()){
-					ASFTag=f.ASFTag(true);
-				}
-				break;
-			case TagLib::Type::ID3v1:
-				cout << "preferedType: ID3v1" << endl;
-				if(!f.hasID3v1Tag()){
-					ID3v1Tag=f.ID3v1Tag(true);
-				}
-				break;
-			case TagLib::Type::ID3v2:
-				cout << "preferedType: ID3v2" << endl;
-				if(!f.hasID3v2Tag()){
-					ID3v2Tag=f.ID3v2Tag(true);
-				}
-				break;
-			case TagLib::Type::MP4:
-				cout << "preferedType: MP4" << endl;
-				if(!f.hasMP4Tag()){
-					MP4Tag=f.MP4Tag(true);
-				}
-				break;
-			case TagLib::Type::XiphComment:
-				cout << "preferedType: XiphComment" << endl;
-				if(!f.hasXiphComment()){
-					XiphComment=f.XiphComment(true);
-				}
-				break;
-			default:
-				cerr << "problematic preferedType" << endl;
-				exit(1);
-				break;
-		}
+		cout << file << endl;
 		if(APETag==NULL && f.hasAPETag()){
 			cout << "\tAPE Tag:" << endl;
 			APETag=f.APETag(false);
@@ -315,7 +270,6 @@ int proc(char *file){
 			if(force_decode_ape)
 				autoConv(U_APE);
 			Conv(U_APE);
-			printUniTag(U_APE);
 			APETag->setTitle(U_APE.title);
 			APETag->setArtist(U_APE.artist);
 			APETag->setAlbum(U_APE.album);
@@ -335,7 +289,6 @@ int proc(char *file){
 			if(force_decode_asf)
 				autoConv(U_ASF);
 			Conv(U_ASF);
-			printUniTag(U_ASF);
 			ASFTag->setTitle(U_ASF.title);
 			ASFTag->setArtist(U_ASF.artist);
 			ASFTag->setAlbum(U_ASF.album);
@@ -354,7 +307,6 @@ int proc(char *file){
 			U_ID3v1.genre=ID3v1Tag->genre();
 			autoConv(U_ID3v1);
 			Conv(U_ID3v1);
-			printUniTag(U_ID3v1);
 			ID3v1Tag->setTitle(U_ID3v1.title);
 			ID3v1Tag->setArtist(U_ID3v1.artist);
 			ID3v1Tag->setAlbum(U_ID3v1.album);
@@ -372,7 +324,6 @@ int proc(char *file){
 			if(force_decode_id3v2)
 				autoConv(U_ID3v2);
 			Conv(U_ID3v2);
-			printUniTag(U_ID3v2);
 			ID3v2Tag->setTitle(U_ID3v2.title);
 			ID3v2Tag->setArtist(U_ID3v2.artist);
 			ID3v2Tag->setAlbum(U_ID3v2.album);
@@ -390,7 +341,6 @@ int proc(char *file){
 			if(force_decode_mp4)
 				autoConv(U_MP4);
 			Conv(U_MP4);
-			printUniTag(U_MP4);
 			MP4Tag->setTitle(U_MP4.title);
 			MP4Tag->setArtist(U_MP4.artist);
 			MP4Tag->setAlbum(U_MP4.album);
@@ -408,7 +358,6 @@ int proc(char *file){
 			if(force_decode_xiph)
 				autoConv(U_Xiph);
 			Conv(U_Xiph);
-			printUniTag(U_Xiph);
 			XiphComment->setTitle(U_Xiph.title);
 			XiphComment->setArtist(U_Xiph.artist);
 			XiphComment->setAlbum(U_Xiph.album);
@@ -426,7 +375,6 @@ int proc(char *file){
 			if(force_decode_all)
 				autoConv(U_Tag);
 			Conv(U_Tag);
-			printUniTag(U_Tag);
 			Tag->setTitle(U_Tag.title);
 			Tag->setArtist(U_Tag.artist);
 			Tag->setAlbum(U_Tag.album);
@@ -434,13 +382,89 @@ int proc(char *file){
 			Tag->setGenre(U_Tag.genre);
 		}
 		if(autoarg){
-			cout << "\tMerged Tag:" << endl;
 			better(U_Tag, U_APE);
 			better(U_Tag, U_ASF);
 			better(U_Tag, U_ID3v1);
 			better(U_Tag, U_ID3v2);
 			better(U_Tag, U_MP4);
 			better(U_Tag, U_Xiph);
+			printUniTag(U_Tag);
+			if(strip)
+				f.strip(~0);
+			switch(f.preferedType()){
+				case TagLib::Type::None:
+					cout << "preferedType: None" << endl;
+					break;
+				case TagLib::Type::APE:
+					cout << "preferedType: APE" << endl;
+					APETag=f.APETag(true);
+					APETag->setTitle(U_Tag.title);
+					APETag->setArtist(U_Tag.artist);
+					APETag->setAlbum(U_Tag.album);
+					APETag->setComment(U_Tag.comment);
+					APETag->setGenre(U_Tag.genre);
+					break;
+				case TagLib::Type::ASF:
+					cout << "preferedType: ASF" << endl;
+					ASFTag=f.ASFTag(true);
+					ASFTag->setTitle(U_Tag.title);
+					ASFTag->setArtist(U_Tag.artist);
+					ASFTag->setAlbum(U_Tag.album);
+					ASFTag->setComment(U_Tag.comment);
+					ASFTag->setGenre(U_Tag.genre);
+					ASFTag->setRating(U_Tag.rating);
+					ASFTag->setCopyright(U_Tag.copyright);
+					break;
+				case TagLib::Type::ID3v1:
+					cout << "preferedType: ID3v1" << endl;
+					ID3v1Tag=f.ID3v1Tag(true);
+					ID3v1Tag->setTitle(U_Tag.title);
+					ID3v1Tag->setArtist(U_Tag.artist);
+					ID3v1Tag->setAlbum(U_Tag.album);
+					ID3v1Tag->setComment(U_Tag.comment);
+					ID3v1Tag->setGenre(U_Tag.genre);
+					break;
+				case TagLib::Type::ID3v2:
+					cout << "preferedType: ID3v2" << endl;
+					ID3v2Tag=f.ID3v2Tag(true);
+					ID3v2Tag->setTitle(U_Tag.title);
+					ID3v2Tag->setArtist(U_Tag.artist);
+					ID3v2Tag->setAlbum(U_Tag.album);
+					ID3v2Tag->setComment(U_Tag.comment);
+					ID3v2Tag->setGenre(U_Tag.genre);
+					break;
+				case TagLib::Type::MP4:
+					cout << "preferedType: MP4" << endl;
+					MP4Tag=f.MP4Tag(true);
+					MP4Tag->setTitle(U_Tag.title);
+					MP4Tag->setArtist(U_Tag.artist);
+					MP4Tag->setAlbum(U_Tag.album);
+					MP4Tag->setComment(U_Tag.comment);
+					MP4Tag->setGenre(U_Tag.genre);
+					break;
+				case TagLib::Type::XiphComment:
+					cout << "preferedType: XiphComment" << endl;
+					XiphComment=f.XiphComment(true);
+					XiphComment->setTitle(U_Xiph.title);
+					XiphComment->setArtist(U_Xiph.artist);
+					XiphComment->setAlbum(U_Xiph.album);
+					XiphComment->setComment(U_Xiph.comment);
+					XiphComment->setGenre(U_Xiph.genre);
+					break;
+				default:
+					cerr << "problematic preferedType" << endl;
+					exit(1);
+					break;
+			}
+		}
+		if(f.hasAPETag()) printUniTag(U_APE);
+		if(f.hasASFTag()) printUniTag(U_ASF);
+		if(f.hasID3v1Tag()) printUniTag(U_ID3v1);
+		if(f.hasID3v2Tag()) printUniTag(U_ID3v2);
+		if(f.hasMP4Tag()) printUniTag(U_MP4);
+		if(f.hasXiphComment()) printUniTag(U_Xiph);
+		if(autoarg){
+			cout << "\tMerged Tag:" << endl;
 			printUniTag(U_Tag);
 		}
 	}else{
@@ -459,6 +483,7 @@ int main(int argc, char *argv[]){
 	inter=NULL;
 
 	autoarg=0;
+	strip=0;
 	eachconv=0;
 	testarg=1;
 	skiparg=1;
@@ -475,7 +500,8 @@ int main(int argc, char *argv[]){
 		cerr << "Options:" << endl;
 		cerr << "\t--notest: Write files" << endl;
 		cerr << "\t--noskip: Use conversion results with failure" << endl;
-		cerr << "\t--auto: Merge all tags with selectng the best data" << endl;
+		cerr << "\t--auto: Merge all tags with selectng the best data and write into prefered tag" << endl;
+		cerr << "\t--strip: (with --auto) Remove all tags before writing prefered tag" << endl;
 		cerr << "\t--each-conv: Don't assume all fields use the same encoding" << endl;
 		cerr << "\t--force-decode-all: Decode tag(s) as ID3v1" << endl;
 		cerr << "\t--force-decode-ape:" << endl;
@@ -531,6 +557,8 @@ int main(int argc, char *argv[]){
 			skiparg=0;
 		}else if(strcmp(argv[argb],"--auto")==0){
 			autoarg=1;
+		}else if(strcmp(argv[argb],"--strip")==0){
+			strip=1;
 		}else if(strcmp(argv[argb],"--each-conv")==0){
 			eachconv=1;
 		}else if(strcmp(argv[argb],"--force-decode-all")==0){
@@ -571,6 +599,11 @@ int main(int argc, char *argv[]){
 		}else{
 			break;
 		}
+	}
+
+	if(!autoarg && strip){
+		cerr << "Without --auto, --strip is disabled." << endl;
+		exit(1);
 	}
 
 	//proceed

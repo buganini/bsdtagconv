@@ -11,6 +11,3 @@ Example:
 Dependencies:
 	bsdconv-5.0
 	buganini/taglib
-
-TODO:
-	migrate from id3v1 to id3v2
