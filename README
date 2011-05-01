@@ -11,3 +11,6 @@ Example:
 Dependencies:
 	bsdconv-5.0
 	buganini/taglib
+
+Bug:
+	--strip with --notest: tags are all removed, but not written
