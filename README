@@ -12,6 +12,6 @@ Dependencies:
 	bsdconv-5.0
 	buganini/taglib
 
-Bugs: (actually these should be done in taglib)
-	hasXXX() doesn't return correct value after strip()
+Bugs: (actually this should be done in taglib)
+	strip() write file without save()
 	--strip with --notest: tags are all removed, but not written
