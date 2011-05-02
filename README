@@ -10,5 +10,8 @@ Dependencies:
 	bsdconv-5.0
 	buganini/taglib
 
+todo:
+	ID3v2: force v2.3 and utf-16le
+
 Bugs:
 	strip() does not strip cleanly
