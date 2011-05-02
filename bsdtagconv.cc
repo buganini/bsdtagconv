@@ -381,36 +381,37 @@ int proc(char *file){
 			better(U_Tag, U_ID3v2);
 			better(U_Tag, U_MP4);
 			better(U_Tag, U_Xiph);
-			if(strip)
-				f.strip(~0);
 		}
-		if(f.hasAPETag()){
+		if(!strip && f.hasAPETag()){
 			cout << "\tAPE Tag:" << endl;
 			printUniTag(U_APE);
 		}
-		if(f.hasASFTag()){
+		if(!strip && f.hasASFTag()){
 			cout << "\tASF Tag:" << endl;
 			printUniTag(U_ASF);		
 		}
-		if(f.hasID3v1Tag()){
+		if(!strip && f.hasID3v1Tag()){
 			cout << "\tID3v1 Tag:" << endl;
 			printUniTag(U_ID3v1);
 		}
-		if(f.hasID3v2Tag()){
+		if(!strip && f.hasID3v2Tag()){
 			cout << "\tID3v2 Tag:" << endl;
 			printUniTag(U_ID3v2);
 		}
-		if(f.hasMP4Tag()){
+		if(!strip && f.hasMP4Tag()){
 			cout << "\tMP4 Tag:" << endl;
 			printUniTag(U_MP4);
 		}
-		if(f.hasXiphComment()){
+		if(!strip && f.hasXiphComment()){
 			cout << "\tXiphComment Tag:" << endl;
 			printUniTag(U_Xiph);
 		}
-		if(f.hasTag()){
+		if(!strip && f.hasTag()){
 			cout << "\tTag:" << endl;
 			printUniTag(U_Tag);
+		}
+		if(!testarg && autoarg && strip){
+			f.strip(~0);
 		}
 		if(autoarg){
 			switch(f.preferedType()){
@@ -479,11 +480,11 @@ int proc(char *file){
 			}
 			printUniTag(U_Tag);
 		}
+		if(testarg==0){
+			f.save();
+		}
 	}else{
 		return 0;
-	}
-	if(testarg==0){
-		f.save();
 	}
 	return 1;
 }
