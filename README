@@ -9,3 +9,6 @@ Example:
 Dependencies:
 	bsdconv-5.0
 	buganini/taglib
+
+Bugs:
+	strip() does not strip cleanly
