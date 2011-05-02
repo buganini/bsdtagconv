@@ -490,7 +490,7 @@ int proc(char *file){
 }
 
 int main(int argc, char *argv[]){
-	int i,argb,p;
+	int i,argb;
 	char *c, *t,*convarg;
 
 	inter=NULL;
@@ -552,14 +552,9 @@ int main(int argc, char *argv[]){
 			cerr << "Failed create conversion instance: " << bsdconv_error() << endl;
 			exit(1);
 		}
-		p=bsdconv_insert_phase(convs[i], INTER, 1);
-		bsdconv_insert_codec(convs[i], (char *)"NORMAL_SCORE", p, 0);
-		p=bsdconv_insert_phase(convs[i], TO, 0);
-		bsdconv_insert_codec(convs[i], (char *)"ASCII", p, 0);
-		bsdconv_insert_codec(convs[i], (char *)"RAW", p, 0);
-		p=bsdconv_insert_phase(convs[i], FROM, 0);
-		bsdconv_insert_codec(convs[i], (char *)"ASCII", p, 0);
-		bsdconv_insert_codec(convs[i], (char *)"UTF-8", p, 0);
+		bsdconv_insert_phase(convs[i], "NORMAL_SCORE", INTER, 1);
+		bsdconv_insert_phase(convs[i], "RAW,ASCII", TO, 0);
+		bsdconv_insert_phase(convs[i], "UTF-8,ASCII", FROM, 0);
 	}
 	free(convarg);
 
