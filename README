@@ -10,6 +10,10 @@ Dependencies:
 	bsdconv-5.0
 	buganini/taglib
 
+Build:
+	git clone git://github.com/buganini/taglib.git
+	make
+
 todo:
 	ID3v2: force v2.3 and utf-16le
 
