@@ -1,6 +1,7 @@
 Example:
 	bsdtagconv 'gbk,ascii;big5,ascii' -i zhtw:zhtw_words --auto blah.mp3
-	argv[1] is ';' joined from-conversion, for id3v1 decoding.
+	argv[1] is ';' joined from-conversion, for decoding tags which use
+	legacy charset/encoding (eg. id3v1).
 	bsdtagconv will choose the best result.
 
 Dependencies:
