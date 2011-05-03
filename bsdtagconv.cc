@@ -491,8 +491,8 @@ int proc(char *file){
 }
 
 int main(int argc, char *argv[]){
-	int i,argb;
-	char *c, *t,*convarg;
+	int i,argb,intern;
+	char *c, *t,*convarg, *interarg;
 
 	inter=NULL;
 
@@ -510,7 +510,7 @@ int main(int argc, char *argv[]){
 
 	//check
 	if(argc<3){
-		cerr << "Usage: bsdtagconv from_conversion[;from_conversion...] [-i inter_conversion] [options..] files" << endl;
+		cerr << "Usage: bsdtagconv from-conversion[;from-conversion...] [-i inter-conversion] [options..] files" << endl;
 		cerr << "Options:" << endl;
 		cerr << "\t--notest: Write files" << endl;
 		cerr << "\t--noskip: Use conversion results with failure" << endl;
@@ -542,7 +542,7 @@ int main(int argc, char *argv[]){
 	c=convarg;
 	for(i=0;i<convn;++i){
 		t=strsep(&c, ";");
-		if(NULL==(convs[i]=bsdconv_create(t))){
+		if(NULL==(convs[i]=bsdconv_create("ascii:utf-8,ascii"))){
 			//exception
 			cerr << bsdconv_error() << endl;
 			for(i-=1;i>=0;--i){
@@ -550,7 +550,11 @@ int main(int argc, char *argv[]){
 			}
 			free(convs);
 			free(convarg);
-			cerr << "Failed create conversion instance: " << bsdconv_error() << endl;
+			cerr << bsdconv_error() << endl;
+			exit(1);
+		}
+		if(bsdconv_replace_phase(convs[i], t, FROM, 0)<0){
+			cerr << bsdconv_error() << endl;
 			exit(1);
 		}
 		bsdconv_insert_phase(convs[i], "NORMAL_SCORE", INTER, 1);
@@ -590,14 +594,28 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[argb],"-i")==0){
 			if(argb+1<argc){
 				argb+=1;
-				if(NULL==(inter=bsdconv_create(argv[argb]))){
+				if(NULL==(inter=bsdconv_create("utf-8,ascii:utf-8,ascii"))){
 					for(i=0;i<convn;++i){
 						bsdconv_destroy(convs[i]);
 					}
 					free(convs);
-					cerr << "Failed create inter conversion instance: " << bsdconv_error() << endl;
+					cerr << bsdconv_error() << endl;
 					exit(1);
 				}
+				interarg=strdup(argv[argb]);
+				intern=1;
+				for(c=interarg;*c;++c)
+					if(*c==':')
+						++intern;
+				c=interarg;
+				for(i=0;i<intern;++i){
+					t=strsep(&c, ":");
+					if(bsdconv_insert_phase(inter, t, INTER, i+1)<0){
+						cerr << bsdconv_error() << endl;
+						exit(1);
+					}
+				}
+				free(interarg);
 			}else{
 				cerr << "Missing argument for -i" << endl;
 				exit(1);

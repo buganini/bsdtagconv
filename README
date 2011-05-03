@@ -1,9 +1,6 @@
-Note:
-	Conversion string needs to be ended with utf-8,ascii.
-
 Example:
-	bsdtagconv 'gbk,ascii:utf-8,ascii;big5,ascii:utf-8,ascii' -i utf-8,ascii:zhtw:zhtw_words:utf-8,ascii --auto blah.mp3
-	argv[1] is ';' joined utf-8 ended conversion, for id3v1 decoding.
+	bsdtagconv 'gbk,ascii;big5,ascii' -i zhtw:zhtw_words --auto blah.mp3
+	argv[1] is ';' joined from-conversion, for id3v1 decoding.
 	bsdtagconv will choose the best result.
 
 Dependencies:
