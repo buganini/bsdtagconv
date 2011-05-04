@@ -207,7 +207,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 #else
   s = fileName;
 #endif
-
+  filename= s + String::null;
   // If this list is updated, the method defaultFileExtensions() should also be
   // updated.  However at some point that list should be created at the same time
   // that a default file type resolver is created.
