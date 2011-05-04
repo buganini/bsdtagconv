@@ -259,7 +259,7 @@ int proc(char *file){
 	TagLib::FileRef f(file);
 	if(!f.isNull()){
 		cout << file << endl;
-		if(APETag==NULL && f.APETag()){
+		if(f.APETag()){
 			APETag=f.APETag(false);
 			U_APE.title=APETag->title();
 			U_APE.artist=APETag->artist();
@@ -275,7 +275,7 @@ int proc(char *file){
 			APETag->setComment(U_APE.comment);
 			APETag->setGenre(U_APE.genre);
 		}
-		if(ASFTag==NULL && f.ASFTag()){
+		if(f.ASFTag()){
 			ASFTag=f.ASFTag(false);
 			U_ASF.title=ASFTag->title();
 			U_ASF.artist=ASFTag->artist();
@@ -295,7 +295,7 @@ int proc(char *file){
 			ASFTag->setRating(U_ASF.rating);
 			ASFTag->setCopyright(U_ASF.copyright);
 		}
-		if(ID3v1Tag==NULL && f.ID3v1Tag()){
+		if(f.ID3v1Tag()){
 			ID3v1Tag=f.ID3v1Tag(false);
 			U_ID3v1.title=ID3v1Tag->title();
 			U_ID3v1.artist=ID3v1Tag->artist();
@@ -310,7 +310,7 @@ int proc(char *file){
 			ID3v1Tag->setComment(U_ID3v1.comment);
 			ID3v1Tag->setGenre(U_ID3v1.genre);
 		}
-		if(ID3v2Tag==NULL && f.ID3v2Tag()){
+		if(f.ID3v2Tag()){
 			ID3v2Tag=f.ID3v2Tag(false);
 			U_ID3v2.title=ID3v2Tag->title();
 			U_ID3v2.artist=ID3v2Tag->artist();
@@ -326,7 +326,7 @@ int proc(char *file){
 			ID3v2Tag->setComment(U_ID3v2.comment);
 			ID3v2Tag->setGenre(U_ID3v2.genre);
 		}
-		if(MP4Tag==NULL && f.MP4Tag()){
+		if(f.MP4Tag()){
 			MP4Tag=f.MP4Tag(false);
 			U_MP4.title=MP4Tag->title();
 			U_MP4.artist=MP4Tag->artist();
@@ -342,7 +342,7 @@ int proc(char *file){
 			MP4Tag->setComment(U_MP4.comment);
 			MP4Tag->setGenre(U_MP4.genre);
 		}
-		if(XiphComment==NULL && f.XiphComment()){
+		if(f.XiphComment()){
 			XiphComment=f.XiphComment(false);
 			U_Xiph.title=XiphComment->title();
 			U_Xiph.artist=XiphComment->artist();
