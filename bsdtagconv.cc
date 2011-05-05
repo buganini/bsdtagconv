@@ -258,12 +258,12 @@ int proc(char *file){
 	TagLib::FileRef f(file);
 	if(!f.isNull()){
 		cout << file << endl;
-		f.U_APE=APETag=f.APETag(false);
-		f.U_ASF=ASFTag=f.ASFTag(false);
-		f.U_ID3v1=ID3v1Tag=f.ID3v1Tag(false);
-		f.U_ID3v2=ID3v2Tag=f.ID3v2Tag(false);
-		f.U_MP4=MP4Tag=f.MP4Tag(false);
-		f.U_Xiph=XiphComment=f.XiphComment(false);
+		f.U_APE=f.APETag(false);
+		f.U_ASF=f.ASFTag(false);
+		f.U_ID3v1=f.ID3v1Tag(false);
+		f.U_ID3v2=f.ID3v2Tag(false);
+		f.U_MP4=f.MP4Tag(false);
+		f.U_Xiph=f.XiphComment(false);
 		if(f.anyTag())
 			f.U_Tag=f.anyTag();
 		if(f.U_APE.load){
