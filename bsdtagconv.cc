@@ -490,6 +490,22 @@ int proc(char *file){
 	return 1;
 }
 
+void usage(){
+	cerr << "Usage: bsdtagconv from-conversion[;from-conversion...] [-i inter-conversion] [options..] files" << endl;
+	cerr << "Options:" << endl;
+	cerr << "\t--notest: Write files" << endl;
+	cerr << "\t--noskip: Use conversion results with failure" << endl;
+	cerr << "\t--auto: Merge all tags with selectng the best data and write into prefered tag" << endl;
+	cerr << "\t--strip: (require --auto) Remove all tags before writing prefered tag" << endl;
+	cerr << "\t--each-conv: Don't assume all fields use the same encoding" << endl;
+	cerr << "\t--force-decode-all: Decode tag(s) as ID3v1" << endl;
+	cerr << "\t--force-decode-ape:" << endl;
+	cerr << "\t--force-decode-asf:" << endl;
+	cerr << "\t--force-decode-id3v2:" << endl;
+	cerr << "\t--force-decode-mp4:" << endl;
+	cerr << "\t--force-decode-xiph:" << endl;
+}
+
 int main(int argc, char *argv[]){
 	int i,argb,intern;
 	char *c, *t,*convarg, *interarg;
@@ -510,19 +526,7 @@ int main(int argc, char *argv[]){
 
 	//check
 	if(argc<3){
-		cerr << "Usage: bsdtagconv from-conversion[;from-conversion...] [-i inter-conversion] [options..] files" << endl;
-		cerr << "Options:" << endl;
-		cerr << "\t--notest: Write files" << endl;
-		cerr << "\t--noskip: Use conversion results with failure" << endl;
-		cerr << "\t--auto: Merge all tags with selectng the best data and write into prefered tag" << endl;
-		cerr << "\t--strip: (require --auto) Remove all tags before writing prefered tag" << endl;
-		cerr << "\t--each-conv: Don't assume all fields use the same encoding" << endl;
-		cerr << "\t--force-decode-all: Decode tag(s) as ID3v1" << endl;
-		cerr << "\t--force-decode-ape:" << endl;
-		cerr << "\t--force-decode-asf:" << endl;
-		cerr << "\t--force-decode-id3v2:" << endl;
-		cerr << "\t--force-decode-mp4:" << endl;
-		cerr << "\t--force-decode-xiph:" << endl;
+		usage();
 		exit(1);
 	}
 
@@ -591,6 +595,9 @@ int main(int argc, char *argv[]){
 			force_decode_mp4=1;
 		}else if(strcmp(argv[argb],"--force-decode-xiph")==0){
 			force_decode_xiph=1;
+		}else if(strcmp(argv[argb],"-h")==0 || strcmp(argv[argb],"--help")==0){
+			usage();
+			exit(0);
 		}else if(strcmp(argv[argb],"-i")==0){
 			if(argb+1<argc){
 				argb+=1;
