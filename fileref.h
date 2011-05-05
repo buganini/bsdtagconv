@@ -46,29 +46,15 @@
 #include <taglib/wavfile.h>
 #include <taglib/apefile.h>
 
+#include <taglib/apetag.h>
+#include <taglib/asftag.h>
+#include <taglib/id3v1tag.h>
+#include <taglib/id3v2tag.h>
+#include <taglib/mp4tag.h>
+#include <taglib/xiphcomment.h>
+
 #include <taglib/taglib_export.h>
 #include <taglib/audioproperties.h>
-
-namespace TagLib {
-  namespace APE {
-    class Tag;
-  }
-  namespace ASF {
-    class Tag;
-  }
-  namespace ID3v1 {
-    class Tag;
-  }
-  namespace ID3v2 {
-    class Tag;
-  }
-  namespace MP4 {
-    class Tag;
-  }
-  namespace Ogg {
-    class XiphComment;
-  }
-}
 
 namespace TagLib {
 
@@ -132,6 +118,7 @@ namespace TagLib {
 
   class UniTag {
     public:
+    bool load;
     TagLib::String title;
     TagLib::String artist;
     TagLib::String album;
@@ -139,15 +126,14 @@ namespace TagLib {
     TagLib::String genre;
     TagLib::String rating;
     TagLib::String copyright;
-    UniTag(){
-      title=TagLib::String::null;
-      artist=TagLib::String::null;
-      album=TagLib::String::null;
-      comment=TagLib::String::null;
-      genre=TagLib::String::null;
-      rating=TagLib::String::null;
-      copyright=TagLib::String::null;
-    }
+    UniTag();
+    UniTag &operator=(const APE::Tag *);
+    UniTag &operator=(const ASF::Tag *);
+    UniTag &operator=(const ID3v1::Tag *);
+    UniTag &operator=(const ID3v2::Tag *);
+    UniTag &operator=(const MP4::Tag *);
+    UniTag &operator=(const Ogg::XiphComment *);
+    UniTag &operator=(const Tag *);
   };
 
   class TAGLIB_EXPORT FileRef

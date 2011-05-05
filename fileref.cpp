@@ -133,43 +133,42 @@ bool FileRef::save()
     debug("FileRef::save() - Called without a valid file.");
     return false;
   }
-  if(preferedTag()==TagType::ID3v2 || ID3v2Tag()){
+  if(preferedTag()==TagType::ID3v2 || U_ID3v2.load){
     ID3_Tag id3t;
     ID3_Frame *frame;
-    ID3v2::Tag * id3f=ID3v2Tag(true);
     unicode_t *p;
 
     frame=new ID3_Frame(ID3FID_TITLE);
     frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
-    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(id3f->title()));
+    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.title));
     frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
     id3t.AttachFrame(frame);
     delete p;
 
     frame=new ID3_Frame(ID3FID_LEADARTIST);
     frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
-    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(id3f->artist()));
+    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.artist));
     frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
     id3t.AttachFrame(frame);
     delete p;
 
     frame=new ID3_Frame(ID3FID_ALBUM);
     frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
-    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(id3f->album()));
+    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.album));
     frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
     id3t.AttachFrame(frame);
     delete p;
 
     frame=new ID3_Frame(ID3FID_COMMENT);
     frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
-    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(id3f->comment()));
+    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.comment));
     frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
     id3t.AttachFrame(frame);
     delete p;
 
     frame=new ID3_Frame(ID3FID_CONTENTTYPE);
     frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
-    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(id3f->genre()));
+    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.genre));
     frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
     id3t.AttachFrame(frame);
     delete p;
@@ -535,4 +534,95 @@ bool FileRef::strip (int tags)
     default:
       return false;
   }
+}
+
+UniTag::UniTag()
+{
+  load=false;
+  title=String::null;
+  artist=String::null;
+  album=String::null;
+  comment=String::null;
+  genre=String::null;
+  rating=String::null;
+  copyright=String::null;
+}
+
+UniTag& UniTag::operator=(const APE::Tag * APETag)
+{
+  load=true;
+  title=APETag->title();
+  artist=APETag->artist();
+  album=APETag->album();
+  comment=APETag->comment();
+  genre=APETag->genre();
+  return *this;
+}
+
+UniTag& UniTag::operator=(const ASF::Tag * ASFTag)
+{
+  load=true;
+  title=ASFTag->title();
+  artist=ASFTag->artist();
+  album=ASFTag->album();
+  comment=ASFTag->comment();
+  genre=ASFTag->genre();
+  rating=ASFTag->rating();
+  copyright=ASFTag->copyright();
+  return *this;
+}
+
+UniTag& UniTag::operator=(const ID3v1::Tag * ID3v1Tag)
+{
+  load=true;
+  title=ID3v1Tag->title();
+  artist=ID3v1Tag->artist();
+  album=ID3v1Tag->album();
+  comment=ID3v1Tag->comment();
+  genre=ID3v1Tag->genre();
+  return *this;
+}
+
+UniTag& UniTag::operator=(const ID3v2::Tag * ID3v2Tag)
+{
+  load=true;
+  title=ID3v2Tag->title();
+  artist=ID3v2Tag->artist();
+  album=ID3v2Tag->album();
+  comment=ID3v2Tag->comment();
+  genre=ID3v2Tag->genre();
+  return *this;
+}
+
+UniTag& UniTag::operator=(const MP4::Tag * MP4Tag)
+{
+  load=true;
+  title=MP4Tag->title();
+  artist=MP4Tag->artist();
+  album=MP4Tag->album();
+  comment=MP4Tag->comment();
+  genre=MP4Tag->genre();
+  return *this;
+}
+
+UniTag& UniTag::operator=(const Ogg::XiphComment * XiphComment)
+{
+  load=true;
+  title=XiphComment->title();
+  artist=XiphComment->artist();
+  album=XiphComment->album();
+  comment=XiphComment->comment();
+  genre=XiphComment->genre();
+  return *this;
+}
+
+UniTag& UniTag::operator=(const Tag * Tag)
+{
+  load=true;
+  title=Tag->title();
+  artist=Tag->artist();
+  album=Tag->album();
+  comment=Tag->comment();
+  genre=Tag->genre();
+  return *this;
 }

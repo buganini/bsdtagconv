@@ -239,11 +239,7 @@ int proc(char *file){
 		cout << file << endl;
 		if(f.APETag()){
 			APETag=f.APETag(false);
-			f.U_APE.title=APETag->title();
-			f.U_APE.artist=APETag->artist();
-			f.U_APE.album=APETag->album();
-			f.U_APE.comment=APETag->comment();
-			f.U_APE.genre=APETag->genre();
+			f.U_APE=APETag;
 			if(force_decode_ape)
 				autoConv(f.U_APE);
 			Conv(f.U_APE);
@@ -255,13 +251,7 @@ int proc(char *file){
 		}
 		if(f.ASFTag()){
 			ASFTag=f.ASFTag(false);
-			f.U_ASF.title=ASFTag->title();
-			f.U_ASF.artist=ASFTag->artist();
-			f.U_ASF.album=ASFTag->album();
-			f.U_ASF.comment=ASFTag->comment();
-			f.U_ASF.genre=ASFTag->genre();
-			f.U_ASF.genre=ASFTag->rating();
-			f.U_ASF.genre=ASFTag->copyright();
+			f.U_ASF=ASFTag;
 			if(force_decode_asf)
 				autoConv(f.U_ASF);
 			Conv(f.U_ASF);
@@ -275,11 +265,7 @@ int proc(char *file){
 		}
 		if(f.ID3v1Tag()){
 			ID3v1Tag=f.ID3v1Tag(false);
-			f.U_ID3v1.title=ID3v1Tag->title();
-			f.U_ID3v1.artist=ID3v1Tag->artist();
-			f.U_ID3v1.album=ID3v1Tag->album();
-			f.U_ID3v1.comment=ID3v1Tag->comment();
-			f.U_ID3v1.genre=ID3v1Tag->genre();
+			f.U_ID3v1=ID3v1Tag;
 			autoConv(f.U_ID3v1);
 			Conv(f.U_ID3v1);
 			ID3v1Tag->setTitle(f.U_ID3v1.title);
@@ -290,11 +276,7 @@ int proc(char *file){
 		}
 		if(f.ID3v2Tag()){
 			ID3v2Tag=f.ID3v2Tag(false);
-			f.U_ID3v2.title=ID3v2Tag->title();
-			f.U_ID3v2.artist=ID3v2Tag->artist();
-			f.U_ID3v2.album=ID3v2Tag->album();
-			f.U_ID3v2.comment=ID3v2Tag->comment();
-			f.U_ID3v2.genre=ID3v2Tag->genre();
+			f.U_ID3v2=ID3v2Tag;
 			if(force_decode_id3v2)
 				autoConv(f.U_ID3v2);
 			Conv(f.U_ID3v2);
@@ -306,11 +288,7 @@ int proc(char *file){
 		}
 		if(f.MP4Tag()){
 			MP4Tag=f.MP4Tag(false);
-			f.U_MP4.title=MP4Tag->title();
-			f.U_MP4.artist=MP4Tag->artist();
-			f.U_MP4.album=MP4Tag->album();
-			f.U_MP4.comment=MP4Tag->comment();
-			f.U_MP4.genre=MP4Tag->genre();
+			f.U_MP4=MP4Tag;
 			if(force_decode_mp4)
 				autoConv(f.U_MP4);
 			Conv(f.U_MP4);
@@ -322,11 +300,7 @@ int proc(char *file){
 		}
 		if(f.XiphComment()){
 			XiphComment=f.XiphComment(false);
-			f.U_Xiph.title=XiphComment->title();
-			f.U_Xiph.artist=XiphComment->artist();
-			f.U_Xiph.album=XiphComment->album();
-			f.U_Xiph.comment=XiphComment->comment();
-			f.U_Xiph.genre=XiphComment->genre();
+			f.U_Xiph=XiphComment;
 			if(force_decode_xiph)
 				autoConv(f.U_Xiph);
 			Conv(f.U_Xiph);
@@ -338,11 +312,7 @@ int proc(char *file){
 		}
 		if(f.tag()){
 			Tag=f.tag();
-			f.U_Tag.title=Tag->title();
-			f.U_Tag.artist=Tag->artist();
-			f.U_Tag.album=Tag->album();
-			f.U_Tag.comment=Tag->comment();
-			f.U_Tag.genre=Tag->genre();
+			f.U_Tag=Tag;
 			if(force_decode_all)
 				autoConv(f.U_Tag);
 			Conv(f.U_Tag);
