@@ -50,6 +50,7 @@ int force_decode_xiph;
 struct bsdconv_instance **convs;
 struct bsdconv_instance *inter;
 struct bsdconv_instance *score;
+struct bsdconv_instance *render;
 int *scores;
 int bestCodec;
 
@@ -57,7 +58,20 @@ class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
 {
 	virtual TagLib::ByteVector render( const TagLib::String &s ) const
 	{
-		return s.data(TagLib::String::UTF8);
+		if(::render==NULL)
+			return TagLib::ByteVector("", 0);
+		TagLib::ByteVector bv(s.to8Bit(true).c_str());
+		bsdconv_init(::render);
+		::render->input.data=(void *)bv.data();
+		::render->input.len=bv.size();
+		::render->input.flags=0;
+		::render->flush=1;
+		::render->output_mode=BSDCONV_AUTOMALLOC;
+		::render->output.len=1;
+		bsdconv(::render);
+		TagLib::ByteVector ret=TagLib::ByteVector((char *)::render->output.data, ::render->output.len);
+		free(::render->output.data);
+		return ret;		
 	}
 };
 
@@ -447,7 +461,7 @@ int proc(char *file){
 }
 
 void usage(){
-	cerr << "Usage: bsdtagconv from-conversion[;from-conversion...] [-i inter-conversion] [options..] files" << endl;
+	cerr << "Usage: bsdtagconv from-conversion[;from-conversion...] [-i inter-conversion] [-r to-conversion] [options..] files" << endl;
 	cerr << "Options:" << endl;
 	cerr << "\t--notest: Write files" << endl;
 	cerr << "\t--noskip: Use conversion results with failure" << endl;
@@ -460,13 +474,16 @@ void usage(){
 	cerr << "\t--force-decode-id3v2:" << endl;
 	cerr << "\t--force-decode-mp4:" << endl;
 	cerr << "\t--force-decode-xiph:" << endl;
+	cerr << "\t-i: inter-convertion" << endl;
+	cerr << "\t-r: to-conversion for rendering ID3v1" << endl;
 }
 
 int main(int argc, char *argv[]){
 	int i,argb,intern;
-	char *c, *t,*convarg, *interarg;
+	char *c, *t,*convarg, *arg;
 
 	inter=NULL;
+	render=NULL;
 
 	autoarg=0;
 	strip=0;
@@ -554,6 +571,31 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[argb],"-h")==0 || strcmp(argv[argb],"--help")==0){
 			usage();
 			exit(0);
+		}else if(strcmp(argv[argb],"-r")==0){
+			if(argb+1<argc){
+				argb+=1;
+				if(NULL==(render=bsdconv_create("utf-8,ascii:utf-8,ascii"))){
+					cerr << bsdconv_error() << endl;
+					exit(1);
+				}
+				arg=strdup(argv[argb]);
+				intern=1;
+				for(c=arg;*c;++c)
+					if(*c==':')
+						++intern;
+				c=arg;
+				for(i=0;i<intern;++i){
+					t=strsep(&c, ":");
+					if(bsdconv_replace_phase(render, t, TO, -1)<0){
+						cerr << bsdconv_error() << endl;
+						exit(1);
+					}
+				}
+				free(arg);
+			}else{
+				cerr << "Missing argument for -r" << endl;
+				exit(1);
+			}
 		}else if(strcmp(argv[argb],"-i")==0){
 			if(argb+1<argc){
 				argb+=1;
@@ -565,12 +607,12 @@ int main(int argc, char *argv[]){
 					cerr << bsdconv_error() << endl;
 					exit(1);
 				}
-				interarg=strdup(argv[argb]);
+				arg=strdup(argv[argb]);
 				intern=1;
-				for(c=interarg;*c;++c)
+				for(c=arg;*c;++c)
 					if(*c==':')
 						++intern;
-				c=interarg;
+				c=arg;
 				for(i=0;i<intern;++i){
 					t=strsep(&c, ":");
 					if(bsdconv_insert_phase(inter, t, INTER, i+1)<0){
@@ -578,7 +620,7 @@ int main(int argc, char *argv[]){
 						exit(1);
 					}
 				}
-				free(interarg);
+				free(arg);
 			}else{
 				cerr << "Missing argument for -i" << endl;
 				exit(1);
