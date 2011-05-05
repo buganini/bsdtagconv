@@ -71,6 +71,7 @@ FileRef::FileRef()
 FileRef::FileRef(FileName fileName, bool readAudioProperties,
                  AudioProperties::ReadStyle audioPropertiesStyle)
 {
+  filename=NULL;
   d = new FileRefPrivate(create(fileName, readAudioProperties, audioPropertiesStyle));
 }
 
@@ -271,6 +272,8 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 #else
   s = fileName;
 #endif
+  if(filename!=NULL)
+    free(filename);
   filename= strdup(fileName);
   // If this list is updated, the method defaultFileExtensions() should also be
   // updated.  However at some point that list should be created at the same time
@@ -505,7 +508,6 @@ bool FileRef::strip (int tags)
   if(tags & TagType::ID3v2) U_ID3v2.load=false;
   if(tags & TagType::MP4) U_MP4.load=false;
   if(tags & TagType::XiphComment) U_Xiph.load=false;
-cout << tags << endl;
   tags=tags_mask(tags);
   switch(filetype)
   {
