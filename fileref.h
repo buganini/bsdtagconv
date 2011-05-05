@@ -339,7 +339,7 @@ namespace TagLib {
     ID3v2::Tag * ID3v2Tag (bool create=false);
     MP4::Tag * MP4Tag (bool create=false);
     Ogg::XiphComment * XiphComment (bool create=false);
-    Tag * tag (bool create=false);
+    Tag * anyTag (bool create=false);
 
     bool strip(int tags);
 

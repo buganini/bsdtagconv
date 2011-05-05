@@ -487,7 +487,7 @@ Ogg::XiphComment * FileRef::XiphComment (bool create)
   }
 }
 
-Tag * FileRef::tag (bool create)
+Tag * FileRef::anyTag (bool create)
 {
   switch(filetype)
   {
@@ -500,7 +500,7 @@ Tag * FileRef::tag (bool create)
 
 bool FileRef::strip (int tags)
 {
-  if(tags==(int)~0){
+  if(tags==0xffff){
     U_APE.load=false;
     U_ASF.load=false;
     U_ID3v1.load=false;
