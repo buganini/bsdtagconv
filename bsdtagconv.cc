@@ -53,6 +53,14 @@ struct bsdconv_instance *score;
 int *scores;
 int bestCodec;
 
+class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
+{
+	virtual TagLib::ByteVector render( const TagLib::String &s ) const
+	{
+		return s.data(TagLib::String::UTF8);
+	}
+};
+
 void autoconv_init(){
 	int i;
 	for(i=0;i<convn;++i){
@@ -587,6 +595,8 @@ int main(int argc, char *argv[]){
 		cerr << "Without --auto, --strip is disabled." << endl;
 		exit(1);
 	}
+
+	TagLib::ID3v1::Tag::setStringHandler( new ID3v1StringHandler() );
 
 	//proceed
 	for(i=argb;i<argc;++i){
