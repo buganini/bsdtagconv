@@ -144,35 +144,35 @@ bool FileRef::save()
     frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.title));
     frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
     id3t.AttachFrame(frame);
-    delete p;
+    delete [] p;
 
     frame=new ID3_Frame(ID3FID_LEADARTIST);
     frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
     frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.artist));
     frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
     id3t.AttachFrame(frame);
-    delete p;
+    delete [] p;
 
     frame=new ID3_Frame(ID3FID_ALBUM);
     frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
     frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.album));
     frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
     id3t.AttachFrame(frame);
-    delete p;
+    delete [] p;
 
     frame=new ID3_Frame(ID3FID_COMMENT);
     frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
     frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.comment));
     frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
     id3t.AttachFrame(frame);
-    delete p;
+    delete [] p;
 
     frame=new ID3_Frame(ID3FID_CONTENTTYPE);
     frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
     frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.genre));
     frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
     id3t.AttachFrame(frame);
-    delete p;
+    delete [] p;
 
     d->file->save();
     delete d;
