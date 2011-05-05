@@ -315,6 +315,7 @@ int proc(char *file){
 		if(f.U_APE.load){
 			cout << "\tAPE Tag:" << endl;
 			printUniTag(f.U_APE);
+			APETag=f.APETag();
 			APETag->setTitle(f.U_APE.title);
 			APETag->setArtist(f.U_APE.artist);
 			APETag->setAlbum(f.U_APE.album);
@@ -324,6 +325,7 @@ int proc(char *file){
 		if(f.U_ASF.load){
 			cout << "\tASF Tag:" << endl;
 			printUniTag(f.U_ASF);		
+			ASFTag=f.ASFTag();
 			ASFTag->setTitle(f.U_ASF.title);
 			ASFTag->setArtist(f.U_ASF.artist);
 			ASFTag->setAlbum(f.U_ASF.album);
@@ -335,6 +337,7 @@ int proc(char *file){
 		if(f.U_ID3v1.load){
 			cout << "\tID3v1 Tag:" << endl;
 			printUniTag(f.U_ID3v1);
+			ID3v1Tag=f.ID3v1Tag();
 			ID3v1Tag->setTitle(f.U_ID3v1.title);
 			ID3v1Tag->setArtist(f.U_ID3v1.artist);
 			ID3v1Tag->setAlbum(f.U_ID3v1.album);
@@ -344,6 +347,7 @@ int proc(char *file){
 		if(f.U_ID3v2.load){
 			cout << "\tID3v2 Tag:" << endl;
 			printUniTag(f.U_ID3v2);
+			ID3v2Tag=f.ID3v2Tag();
 			ID3v2Tag->setTitle(f.U_ID3v2.title);
 			ID3v2Tag->setArtist(f.U_ID3v2.artist);
 			ID3v2Tag->setAlbum(f.U_ID3v2.album);
@@ -353,6 +357,7 @@ int proc(char *file){
 		if(f.U_MP4.load){
 			cout << "\tMP4 Tag:" << endl;
 			printUniTag(f.U_MP4);
+			MP4Tag=f.MP4Tag();
 			MP4Tag->setTitle(f.U_MP4.title);
 			MP4Tag->setArtist(f.U_MP4.artist);
 			MP4Tag->setAlbum(f.U_MP4.album);
@@ -362,6 +367,7 @@ int proc(char *file){
 		if(f.U_Xiph.load){
 			cout << "\tXiphComment Tag:" << endl;
 			printUniTag(f.U_Xiph);
+			XiphComment=f.XiphComment();
 			XiphComment->setTitle(f.U_Xiph.title);
 			XiphComment->setArtist(f.U_Xiph.artist);
 			XiphComment->setAlbum(f.U_Xiph.album);
