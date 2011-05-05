@@ -559,79 +559,232 @@ UniTag::UniTag()
 
 UniTag& UniTag::operator=(const APE::Tag * APETag)
 {
+  if(APETag==NULL)
+    return *this;
+
   load=true;
+
   title=APETag->title();
+  if(title.isEmpty()) title=String::null;
+
   artist=APETag->artist();
+  if(artist.isEmpty()) artist=String::null;
+
   album=APETag->album();
+  if(album.isEmpty()) album=String::null;
+
   comment=APETag->comment();
+  if(comment.isEmpty()) comment=String::null;
+
   genre=APETag->genre();
+  if(genre.isEmpty()) genre=String::null;
+
+  if(title.isNull() &&
+     artist.isNull() &&
+     album.isNull() &&
+     comment.isNull() &&
+     genre.isNull()){
+     load=false;
+  }
   return *this;
 }
 
 UniTag& UniTag::operator=(const ASF::Tag * ASFTag)
 {
+  if(ASFTag==NULL)
+    return *this;
+
   load=true;
+
   title=ASFTag->title();
+  if(title.isEmpty()) title=String::null;
+
   artist=ASFTag->artist();
+  if(artist.isEmpty()) artist=String::null;
+
   album=ASFTag->album();
+  if(album.isEmpty()) album=String::null;
+
   comment=ASFTag->comment();
+  if(comment.isEmpty()) comment=String::null;
+
   genre=ASFTag->genre();
+  if(genre.isEmpty()) genre=String::null;
+
   rating=ASFTag->rating();
+  if(rating.isEmpty()) rating=String::null;
+
   copyright=ASFTag->copyright();
+  if(copyright.isEmpty()) copyright=String::null;
+
+  if(title.isNull() &&
+     artist.isNull() &&
+     album.isNull() &&
+     comment.isNull() &&
+     genre.isNull() &&
+     rating.isNull() &&
+     copyright.isNull()){
+     load=false;
+  }
   return *this;
 }
 
 UniTag& UniTag::operator=(const ID3v1::Tag * ID3v1Tag)
 {
+  if(ID3v1Tag==NULL)
+    return *this;
+
   load=true;
+
   title=ID3v1Tag->title();
+  if(title.isEmpty()) title=String::null;
+
   artist=ID3v1Tag->artist();
+  if(artist.isEmpty()) artist=String::null;
+
   album=ID3v1Tag->album();
+  if(album.isEmpty()) album=String::null;
+
   comment=ID3v1Tag->comment();
+  if(comment.isEmpty()) comment=String::null;
+
   genre=ID3v1Tag->genre();
+  if(genre.isEmpty()) genre=String::null;
+
+  if(title.isNull() &&
+     artist.isNull() &&
+     album.isNull() &&
+     comment.isNull() &&
+     genre.isNull()){
+     load=false;
+  }
   return *this;
 }
 
 UniTag& UniTag::operator=(const ID3v2::Tag * ID3v2Tag)
 {
+  if(ID3v2Tag==NULL)
+    return *this;
+
   load=true;
+
   title=ID3v2Tag->title();
+  if(title.isEmpty()) title=String::null;
+
   artist=ID3v2Tag->artist();
+  if(artist.isEmpty()) artist=String::null;
+
   album=ID3v2Tag->album();
+  if(album.isEmpty()) album=String::null;
+
   comment=ID3v2Tag->comment();
+  if(comment.isEmpty()) comment=String::null;
+
   genre=ID3v2Tag->genre();
+  if(genre.isEmpty()) genre=String::null;
+
+  if(title.isNull() &&
+     artist.isNull() &&
+     album.isNull() &&
+     comment.isNull() &&
+     genre.isNull()){
+     load=false;
+  }
   return *this;
 }
 
 UniTag& UniTag::operator=(const MP4::Tag * MP4Tag)
 {
+  if(MP4Tag==NULL)
+    return *this;
+
   load=true;
+
   title=MP4Tag->title();
+  if(title.isEmpty()) title=String::null;
+
   artist=MP4Tag->artist();
+  if(artist.isEmpty()) artist=String::null;
+
   album=MP4Tag->album();
+  if(album.isEmpty()) album=String::null;
+
   comment=MP4Tag->comment();
+  if(comment.isEmpty()) comment=String::null;
+
   genre=MP4Tag->genre();
+  if(genre.isEmpty()) genre=String::null;
+
+  if(title.isNull() &&
+     artist.isNull() &&
+     album.isNull() &&
+     comment.isNull() &&
+     genre.isNull()){
+     load=false;
+  }
   return *this;
 }
 
 UniTag& UniTag::operator=(const Ogg::XiphComment * XiphComment)
 {
+  if(XiphComment==NULL)
+    return *this;
+
   load=true;
+
   title=XiphComment->title();
+  if(title.isEmpty()) title=String::null;
+
   artist=XiphComment->artist();
+  if(artist.isEmpty()) artist=String::null;
+
   album=XiphComment->album();
+  if(album.isEmpty()) album=String::null;
+
   comment=XiphComment->comment();
+  if(comment.isEmpty()) comment=String::null;
+
   genre=XiphComment->genre();
+  if(genre.isEmpty()) genre=String::null;
+
+  if(title.isNull() &&
+     artist.isNull() &&
+     album.isNull() &&
+     comment.isNull() &&
+     genre.isNull()){
+     load=false;
+  }
   return *this;
 }
 
 UniTag& UniTag::operator=(const Tag * Tag)
 {
+  if(Tag==NULL)
+    return *this;
+
   load=true;
+
   title=Tag->title();
+  if(title.isEmpty()) title=String::null;
+
   artist=Tag->artist();
+  if(artist.isEmpty()) artist=String::null;
+
   album=Tag->album();
+  if(album.isEmpty()) album=String::null;
+
   comment=Tag->comment();
+  if(comment.isEmpty()) comment=String::null;
+
   genre=Tag->genre();
+  if(genre.isEmpty()) genre=String::null;
+
+  if(title.isNull() &&
+     artist.isNull() &&
+     album.isNull() &&
+     comment.isNull() &&
+     genre.isNull()){
+     load=false;
+  }
   return *this;
 }

@@ -255,54 +255,47 @@ int proc(char *file){
 	TagLib::ID3v2::Tag * ID3v2Tag=NULL;
 	TagLib::MP4::Tag * MP4Tag=NULL;
 	TagLib::Ogg::XiphComment * XiphComment=NULL;
-	TagLib::Tag * Tag=NULL;
 	TagLib::FileRef f(file);
 	if(!f.isNull()){
 		cout << file << endl;
-		if(f.APETag()){
-			APETag=f.APETag(false);
-			f.U_APE=APETag;
+		f.U_APE=APETag=f.APETag(false);
+		f.U_ASF=ASFTag=f.ASFTag(false);
+		f.U_ID3v1=ID3v1Tag=f.ID3v1Tag(false);
+		f.U_ID3v2=ID3v2Tag=f.ID3v2Tag(false);
+		f.U_MP4=MP4Tag=f.MP4Tag(false);
+		f.U_Xiph=XiphComment=f.XiphComment(false);
+		if(f.anyTag())
+			f.U_Tag=f.anyTag();
+		if(f.U_APE.load){
 			if(force_decode_ape)
 				autoConv(f.U_APE);
 			Conv(f.U_APE);
 		}
-		if(f.ASFTag()){
-			ASFTag=f.ASFTag(false);
-			f.U_ASF=ASFTag;
+		if(f.U_ASF.load){
 			if(force_decode_asf)
 				autoConv(f.U_ASF);
 			Conv(f.U_ASF);
 		}
-		if(f.ID3v1Tag()){
-			ID3v1Tag=f.ID3v1Tag(false);
-			f.U_ID3v1=ID3v1Tag;
+		if(f.U_ID3v1.load){
 			autoConv(f.U_ID3v1);
 			Conv(f.U_ID3v1);
 		}
-		if(f.ID3v2Tag()){
-			ID3v2Tag=f.ID3v2Tag(false);
-			f.U_ID3v2=ID3v2Tag;
+		if(f.U_ID3v2.load){
 			if(force_decode_id3v2)
 				autoConv(f.U_ID3v2);
 			Conv(f.U_ID3v2);
 		}
-		if(f.MP4Tag()){
-			MP4Tag=f.MP4Tag(false);
-			f.U_MP4=MP4Tag;
+		if(f.U_MP4.load){
 			if(force_decode_mp4)
 				autoConv(f.U_MP4);
 			Conv(f.U_MP4);
 		}
-		if(f.XiphComment()){
-			XiphComment=f.XiphComment(false);
-			f.U_Xiph=XiphComment;
+		if(f.U_Xiph.load){
 			if(force_decode_xiph)
 				autoConv(f.U_Xiph);
 			Conv(f.U_Xiph);
 		}
-		if(f.anyTag()){
-			Tag=f.anyTag();
-			f.U_Tag=Tag;
+		if(f.U_Tag.load){
 			if(force_decode_all)
 				autoConv(f.U_Tag);
 			Conv(f.U_Tag);
@@ -315,39 +308,13 @@ int proc(char *file){
 			better(f.U_Tag, f.U_MP4);
 			better(f.U_Tag, f.U_Xiph);
 		}
-		if(!strip && f.APETag()){
-			cout << "\tAPE Tag:" << endl;
-			printUniTag(f.U_APE);
-		}
-		if(!strip && f.ASFTag()){
-			cout << "\tASF Tag:" << endl;
-			printUniTag(f.U_ASF);		
-		}
-		if(!strip && f.ID3v1Tag()){
-			cout << "\tID3v1 Tag:" << endl;
-			printUniTag(f.U_ID3v1);
-		}
-		if(!strip && f.ID3v2Tag()){
-			cout << "\tID3v2 Tag:" << endl;
-			printUniTag(f.U_ID3v2);
-		}
-		if(!strip && f.MP4Tag()){
-			cout << "\tMP4 Tag:" << endl;
-			printUniTag(f.U_MP4);
-		}
-		if(!strip && f.XiphComment()){
-			cout << "\tXiphComment Tag:" << endl;
-			printUniTag(f.U_Xiph);
-		}
-		if(!strip && f.anyTag()){
-			cout << "\tTag:" << endl;
-			printUniTag(f.U_Tag);
-		}
 		if(!testarg && autoarg && strip){
 			f.strip(0xffff);
 			f.save();
 		}
 		if(f.U_APE.load){
+			cout << "\tAPE Tag:" << endl;
+			printUniTag(f.U_APE);
 			APETag->setTitle(f.U_APE.title);
 			APETag->setArtist(f.U_APE.artist);
 			APETag->setAlbum(f.U_APE.album);
@@ -355,6 +322,8 @@ int proc(char *file){
 			APETag->setGenre(f.U_APE.genre);
 		}
 		if(f.U_ASF.load){
+			cout << "\tASF Tag:" << endl;
+			printUniTag(f.U_ASF);		
 			ASFTag->setTitle(f.U_ASF.title);
 			ASFTag->setArtist(f.U_ASF.artist);
 			ASFTag->setAlbum(f.U_ASF.album);
@@ -364,6 +333,8 @@ int proc(char *file){
 			ASFTag->setCopyright(f.U_ASF.copyright);
 		}
 		if(f.U_ID3v1.load){
+			cout << "\tID3v1 Tag:" << endl;
+			printUniTag(f.U_ID3v1);
 			ID3v1Tag->setTitle(f.U_ID3v1.title);
 			ID3v1Tag->setArtist(f.U_ID3v1.artist);
 			ID3v1Tag->setAlbum(f.U_ID3v1.album);
@@ -371,6 +342,8 @@ int proc(char *file){
 			ID3v1Tag->setGenre(f.U_ID3v1.genre);
 		}
 		if(f.U_ID3v2.load){
+			cout << "\tID3v2 Tag:" << endl;
+			printUniTag(f.U_ID3v2);
 			ID3v2Tag->setTitle(f.U_ID3v2.title);
 			ID3v2Tag->setArtist(f.U_ID3v2.artist);
 			ID3v2Tag->setAlbum(f.U_ID3v2.album);
@@ -378,6 +351,8 @@ int proc(char *file){
 			ID3v2Tag->setGenre(f.U_ID3v2.genre);
 		}
 		if(f.U_MP4.load){
+			cout << "\tMP4 Tag:" << endl;
+			printUniTag(f.U_MP4);
 			MP4Tag->setTitle(f.U_MP4.title);
 			MP4Tag->setArtist(f.U_MP4.artist);
 			MP4Tag->setAlbum(f.U_MP4.album);
@@ -385,6 +360,8 @@ int proc(char *file){
 			MP4Tag->setGenre(f.U_MP4.genre);
 		}
 		if(f.U_Xiph.load){
+			cout << "\tXiphComment Tag:" << endl;
+			printUniTag(f.U_Xiph);
 			XiphComment->setTitle(f.U_Xiph.title);
 			XiphComment->setArtist(f.U_Xiph.artist);
 			XiphComment->setAlbum(f.U_Xiph.album);
