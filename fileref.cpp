@@ -499,25 +499,13 @@ Tag * FileRef::tag (bool create)
 
 bool FileRef::strip (int tags)
 {
-  switch(tags){
-    case TagLib::TagType::APE:
-      U_APE=UniTag();
-      break;
-    case TagLib::TagType::ASF:
-      U_ASF=UniTag();
-      break;
-    case TagLib::TagType::ID3v1:
-      U_ID3v1=UniTag();
-      break;
-    case TagLib::TagType::ID3v2:
-      U_ID3v2=UniTag();
-      break;
-    case TagLib::TagType::MP4:
-      U_MP4=UniTag();
-      break;
-    case TagLib::TagType::XiphComment:
-      U_Xiph=UniTag();
-      break;
+  if(tags==(int)~0){
+    U_APE.load=false;
+    U_ASF.load=false;
+    U_ID3v1.load=false;
+    U_ID3v2.load=false;
+    U_MP4.load=false;
+    U_Xiph.load=false;
   }
   switch(filetype)
   {

@@ -385,12 +385,14 @@ int proc(char *file){
 			f.save();
 		}
 		if(autoarg){
+			f.U_Tag.load=true;
 			switch(f.preferedTag()){
 				case TagLib::TagType::None:
 					cout << "\tpreferedType: None" << endl;
 					break;
 				case TagLib::TagType::APE:
 					cout << "\tpreferedType: APE" << endl;
+					f.U_APE=f.U_Tag;
 					APETag=f.APETag(true);
 					APETag->setTitle(f.U_Tag.title);
 					APETag->setArtist(f.U_Tag.artist);
@@ -400,6 +402,7 @@ int proc(char *file){
 					break;
 				case TagLib::TagType::ASF:
 					cout << "\tpreferedType: ASF" << endl;
+					f.U_ASF=f.U_Tag;
 					ASFTag=f.ASFTag(true);
 					ASFTag->setTitle(f.U_Tag.title);
 					ASFTag->setArtist(f.U_Tag.artist);
@@ -410,6 +413,7 @@ int proc(char *file){
 					ASFTag->setCopyright(f.U_Tag.copyright);
 					break;
 				case TagLib::TagType::ID3v1:
+					f.U_ID3v1=f.U_Tag;
 					cout << "\tpreferedType: ID3v1" << endl;
 					ID3v1Tag=f.ID3v1Tag(true);
 					ID3v1Tag->setTitle(f.U_Tag.title);
@@ -420,6 +424,7 @@ int proc(char *file){
 					break;
 				case TagLib::TagType::ID3v2:
 					cout << "\tpreferedType: ID3v2" << endl;
+					f.U_ID3v2=f.U_Tag;
 					ID3v2Tag=f.ID3v2Tag(true);
 					ID3v2Tag->setTitle(f.U_Tag.title);
 					ID3v2Tag->setArtist(f.U_Tag.artist);
@@ -429,6 +434,7 @@ int proc(char *file){
 					break;
 				case TagLib::TagType::MP4:
 					cout << "\tpreferedType: MP4" << endl;
+					f.U_MP4=f.U_Tag;
 					MP4Tag=f.MP4Tag(true);
 					MP4Tag->setTitle(f.U_Tag.title);
 					MP4Tag->setArtist(f.U_Tag.artist);
@@ -438,6 +444,7 @@ int proc(char *file){
 					break;
 				case TagLib::TagType::XiphComment:
 					cout << "\tpreferedType: XiphComment" << endl;
+					f.U_Xiph=f.U_Tag;
 					XiphComment=f.XiphComment(true);
 					XiphComment->setTitle(f.U_Tag.title);
 					XiphComment->setArtist(f.U_Tag.artist);
