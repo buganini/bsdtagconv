@@ -133,7 +133,7 @@ bool FileRef::save()
     debug("FileRef::save() - Called without a valid file.");
     return false;
   }
-  if(preferedTag()==TagType::ID3v2){
+  if(preferedTag()==TagType::ID3v2 || ID3v2Tag()){
     ID3_Tag id3t;
     ID3_Frame *frame;
     ID3v2::Tag * id3f=ID3v2Tag(true);
