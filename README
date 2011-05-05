@@ -10,5 +10,5 @@ Dependencies:
 	audio/taglib
 
 TODO/BUGS:
-	strip is not working
+	strip is not working (after reading tags)
 	deal with non-text field
