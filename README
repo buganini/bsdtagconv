@@ -9,6 +9,7 @@ Dependencies:
 	audio/id3lib
 	audio/taglib
 
-TODO:
+TODO/BUGS:
+	id3v1 vanish
 	strip() does not strip cleanly
 	deal with non-text field
