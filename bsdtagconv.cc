@@ -53,33 +53,12 @@ struct bsdconv_instance *score;
 int *scores;
 int bestCodec;
 
-class UniTag {
-	public:
-	TagLib::String title;
-	TagLib::String artist;
-	TagLib::String album;
-	TagLib::String comment;
-	TagLib::String genre;
-	TagLib::String rating;
-	TagLib::String copyright;
-	UniTag(){
-		title=TagLib::String::null;
-		artist=TagLib::String::null;
-		album=TagLib::String::null;
-		comment=TagLib::String::null;
-		genre=TagLib::String::null;
-		rating=TagLib::String::null;
-		copyright=TagLib::String::null;
-	}
-};
-
 void autoconv_init(){
 	int i;
 	for(i=0;i<convn;++i){
 		scores[i]=0;
 	}
 }
-
 
 void autoconv_test(TagLib::String s){
 	TagLib::ByteVector bv(s.to8Bit(true).c_str());
@@ -143,7 +122,7 @@ int score_eval(TagLib::String s){
 	return ret;
 }
 
-void autoConv(UniTag &U){
+void autoConv(TagLib::UniTag &U){
 	if(eachconv){
 		autoconv_init();
 		if(!U.title.isNull()) autoconv_test(U.title);
@@ -217,7 +196,7 @@ TagLib::String conv(TagLib::String res){
 
 }
 
-void Conv(UniTag &U){
+void Conv(TagLib::UniTag &U){
 	if(!U.title.isNull()) U.title=conv(U.title);
 	if(!U.artist.isNull()) U.artist=conv(U.artist);
 	if(!U.album.isNull()) U.album=conv(U.album);
@@ -227,7 +206,7 @@ void Conv(UniTag &U){
 	if(!U.copyright.isNull()) U.genre=conv(U.copyright);
 }
 
-void printUniTag(UniTag &U){
+void printUniTag(TagLib::UniTag &U){
 	if(!U.title.isNull()) cout << "\t\tTitle: " << U.title.to8Bit(true) << endl;
 	if(!U.artist.isNull()) cout << "\t\tArtist: " << U.artist.to8Bit(true) << endl;
 	if(!U.album.isNull()) cout << "\t\tAlbum: " << U.album.to8Bit(true) << endl;
@@ -237,7 +216,7 @@ void printUniTag(UniTag &U){
 	if(!U.copyright.isNull()) cout << "\t\tCopyright: " << U.copyright.to8Bit(true) << endl;
 }
 
-void better(UniTag &A, UniTag &B){
+void better(TagLib::UniTag &A, TagLib::UniTag &B){
 	if(score_eval(A.title) < score_eval(B.title)) A.title=B.title;
 	if(score_eval(A.artist) < score_eval(B.artist)) A.artist=B.artist;
 	if(score_eval(A.album) < score_eval(B.album)) A.album=B.album;
@@ -248,7 +227,6 @@ void better(UniTag &A, UniTag &B){
 }
 
 int proc(char *file){
-	UniTag U_APE, U_ASF, U_ID3v1, U_ID3v2, U_MP4, U_Xiph, U_Tag;
 	TagLib::APE::Tag * APETag=NULL;
 	TagLib::ASF::Tag * ASFTag=NULL;
 	TagLib::ID3v1::Tag * ID3v1Tag=NULL;
@@ -261,154 +239,154 @@ int proc(char *file){
 		cout << file << endl;
 		if(f.APETag()){
 			APETag=f.APETag(false);
-			U_APE.title=APETag->title();
-			U_APE.artist=APETag->artist();
-			U_APE.album=APETag->album();
-			U_APE.comment=APETag->comment();
-			U_APE.genre=APETag->genre();
+			f.U_APE.title=APETag->title();
+			f.U_APE.artist=APETag->artist();
+			f.U_APE.album=APETag->album();
+			f.U_APE.comment=APETag->comment();
+			f.U_APE.genre=APETag->genre();
 			if(force_decode_ape)
-				autoConv(U_APE);
-			Conv(U_APE);
-			APETag->setTitle(U_APE.title);
-			APETag->setArtist(U_APE.artist);
-			APETag->setAlbum(U_APE.album);
-			APETag->setComment(U_APE.comment);
-			APETag->setGenre(U_APE.genre);
+				autoConv(f.U_APE);
+			Conv(f.U_APE);
+			APETag->setTitle(f.U_APE.title);
+			APETag->setArtist(f.U_APE.artist);
+			APETag->setAlbum(f.U_APE.album);
+			APETag->setComment(f.U_APE.comment);
+			APETag->setGenre(f.U_APE.genre);
 		}
 		if(f.ASFTag()){
 			ASFTag=f.ASFTag(false);
-			U_ASF.title=ASFTag->title();
-			U_ASF.artist=ASFTag->artist();
-			U_ASF.album=ASFTag->album();
-			U_ASF.comment=ASFTag->comment();
-			U_ASF.genre=ASFTag->genre();
-			U_ASF.genre=ASFTag->rating();
-			U_ASF.genre=ASFTag->copyright();
+			f.U_ASF.title=ASFTag->title();
+			f.U_ASF.artist=ASFTag->artist();
+			f.U_ASF.album=ASFTag->album();
+			f.U_ASF.comment=ASFTag->comment();
+			f.U_ASF.genre=ASFTag->genre();
+			f.U_ASF.genre=ASFTag->rating();
+			f.U_ASF.genre=ASFTag->copyright();
 			if(force_decode_asf)
-				autoConv(U_ASF);
-			Conv(U_ASF);
-			ASFTag->setTitle(U_ASF.title);
-			ASFTag->setArtist(U_ASF.artist);
-			ASFTag->setAlbum(U_ASF.album);
-			ASFTag->setComment(U_ASF.comment);
-			ASFTag->setGenre(U_ASF.genre);
-			ASFTag->setRating(U_ASF.rating);
-			ASFTag->setCopyright(U_ASF.copyright);
+				autoConv(f.U_ASF);
+			Conv(f.U_ASF);
+			ASFTag->setTitle(f.U_ASF.title);
+			ASFTag->setArtist(f.U_ASF.artist);
+			ASFTag->setAlbum(f.U_ASF.album);
+			ASFTag->setComment(f.U_ASF.comment);
+			ASFTag->setGenre(f.U_ASF.genre);
+			ASFTag->setRating(f.U_ASF.rating);
+			ASFTag->setCopyright(f.U_ASF.copyright);
 		}
 		if(f.ID3v1Tag()){
 			ID3v1Tag=f.ID3v1Tag(false);
-			U_ID3v1.title=ID3v1Tag->title();
-			U_ID3v1.artist=ID3v1Tag->artist();
-			U_ID3v1.album=ID3v1Tag->album();
-			U_ID3v1.comment=ID3v1Tag->comment();
-			U_ID3v1.genre=ID3v1Tag->genre();
-			autoConv(U_ID3v1);
-			Conv(U_ID3v1);
-			ID3v1Tag->setTitle(U_ID3v1.title);
-			ID3v1Tag->setArtist(U_ID3v1.artist);
-			ID3v1Tag->setAlbum(U_ID3v1.album);
-			ID3v1Tag->setComment(U_ID3v1.comment);
-			ID3v1Tag->setGenre(U_ID3v1.genre);
+			f.U_ID3v1.title=ID3v1Tag->title();
+			f.U_ID3v1.artist=ID3v1Tag->artist();
+			f.U_ID3v1.album=ID3v1Tag->album();
+			f.U_ID3v1.comment=ID3v1Tag->comment();
+			f.U_ID3v1.genre=ID3v1Tag->genre();
+			autoConv(f.U_ID3v1);
+			Conv(f.U_ID3v1);
+			ID3v1Tag->setTitle(f.U_ID3v1.title);
+			ID3v1Tag->setArtist(f.U_ID3v1.artist);
+			ID3v1Tag->setAlbum(f.U_ID3v1.album);
+			ID3v1Tag->setComment(f.U_ID3v1.comment);
+			ID3v1Tag->setGenre(f.U_ID3v1.genre);
 		}
 		if(f.ID3v2Tag()){
 			ID3v2Tag=f.ID3v2Tag(false);
-			U_ID3v2.title=ID3v2Tag->title();
-			U_ID3v2.artist=ID3v2Tag->artist();
-			U_ID3v2.album=ID3v2Tag->album();
-			U_ID3v2.comment=ID3v2Tag->comment();
-			U_ID3v2.genre=ID3v2Tag->genre();
+			f.U_ID3v2.title=ID3v2Tag->title();
+			f.U_ID3v2.artist=ID3v2Tag->artist();
+			f.U_ID3v2.album=ID3v2Tag->album();
+			f.U_ID3v2.comment=ID3v2Tag->comment();
+			f.U_ID3v2.genre=ID3v2Tag->genre();
 			if(force_decode_id3v2)
-				autoConv(U_ID3v2);
-			Conv(U_ID3v2);
-			ID3v2Tag->setTitle(U_ID3v2.title);
-			ID3v2Tag->setArtist(U_ID3v2.artist);
-			ID3v2Tag->setAlbum(U_ID3v2.album);
-			ID3v2Tag->setComment(U_ID3v2.comment);
-			ID3v2Tag->setGenre(U_ID3v2.genre);
+				autoConv(f.U_ID3v2);
+			Conv(f.U_ID3v2);
+			ID3v2Tag->setTitle(f.U_ID3v2.title);
+			ID3v2Tag->setArtist(f.U_ID3v2.artist);
+			ID3v2Tag->setAlbum(f.U_ID3v2.album);
+			ID3v2Tag->setComment(f.U_ID3v2.comment);
+			ID3v2Tag->setGenre(f.U_ID3v2.genre);
 		}
 		if(f.MP4Tag()){
 			MP4Tag=f.MP4Tag(false);
-			U_MP4.title=MP4Tag->title();
-			U_MP4.artist=MP4Tag->artist();
-			U_MP4.album=MP4Tag->album();
-			U_MP4.comment=MP4Tag->comment();
-			U_MP4.genre=MP4Tag->genre();
+			f.U_MP4.title=MP4Tag->title();
+			f.U_MP4.artist=MP4Tag->artist();
+			f.U_MP4.album=MP4Tag->album();
+			f.U_MP4.comment=MP4Tag->comment();
+			f.U_MP4.genre=MP4Tag->genre();
 			if(force_decode_mp4)
-				autoConv(U_MP4);
-			Conv(U_MP4);
-			MP4Tag->setTitle(U_MP4.title);
-			MP4Tag->setArtist(U_MP4.artist);
-			MP4Tag->setAlbum(U_MP4.album);
-			MP4Tag->setComment(U_MP4.comment);
-			MP4Tag->setGenre(U_MP4.genre);
+				autoConv(f.U_MP4);
+			Conv(f.U_MP4);
+			MP4Tag->setTitle(f.U_MP4.title);
+			MP4Tag->setArtist(f.U_MP4.artist);
+			MP4Tag->setAlbum(f.U_MP4.album);
+			MP4Tag->setComment(f.U_MP4.comment);
+			MP4Tag->setGenre(f.U_MP4.genre);
 		}
 		if(f.XiphComment()){
 			XiphComment=f.XiphComment(false);
-			U_Xiph.title=XiphComment->title();
-			U_Xiph.artist=XiphComment->artist();
-			U_Xiph.album=XiphComment->album();
-			U_Xiph.comment=XiphComment->comment();
-			U_Xiph.genre=XiphComment->genre();
+			f.U_Xiph.title=XiphComment->title();
+			f.U_Xiph.artist=XiphComment->artist();
+			f.U_Xiph.album=XiphComment->album();
+			f.U_Xiph.comment=XiphComment->comment();
+			f.U_Xiph.genre=XiphComment->genre();
 			if(force_decode_xiph)
-				autoConv(U_Xiph);
-			Conv(U_Xiph);
-			XiphComment->setTitle(U_Xiph.title);
-			XiphComment->setArtist(U_Xiph.artist);
-			XiphComment->setAlbum(U_Xiph.album);
-			XiphComment->setComment(U_Xiph.comment);
-			XiphComment->setGenre(U_Xiph.genre);
+				autoConv(f.U_Xiph);
+			Conv(f.U_Xiph);
+			XiphComment->setTitle(f.U_Xiph.title);
+			XiphComment->setArtist(f.U_Xiph.artist);
+			XiphComment->setAlbum(f.U_Xiph.album);
+			XiphComment->setComment(f.U_Xiph.comment);
+			XiphComment->setGenre(f.U_Xiph.genre);
 		}
 		if(f.tag()){
 			Tag=f.tag();
-			U_Tag.title=Tag->title();
-			U_Tag.artist=Tag->artist();
-			U_Tag.album=Tag->album();
-			U_Tag.comment=Tag->comment();
-			U_Tag.genre=Tag->genre();
+			f.U_Tag.title=Tag->title();
+			f.U_Tag.artist=Tag->artist();
+			f.U_Tag.album=Tag->album();
+			f.U_Tag.comment=Tag->comment();
+			f.U_Tag.genre=Tag->genre();
 			if(force_decode_all)
-				autoConv(U_Tag);
-			Conv(U_Tag);
-			Tag->setTitle(U_Tag.title);
-			Tag->setArtist(U_Tag.artist);
-			Tag->setAlbum(U_Tag.album);
-			Tag->setComment(U_Tag.comment);
-			Tag->setGenre(U_Tag.genre);
+				autoConv(f.U_Tag);
+			Conv(f.U_Tag);
+			Tag->setTitle(f.U_Tag.title);
+			Tag->setArtist(f.U_Tag.artist);
+			Tag->setAlbum(f.U_Tag.album);
+			Tag->setComment(f.U_Tag.comment);
+			Tag->setGenre(f.U_Tag.genre);
 		}
 		if(autoarg){
-			better(U_Tag, U_APE);
-			better(U_Tag, U_ASF);
-			better(U_Tag, U_ID3v1);
-			better(U_Tag, U_ID3v2);
-			better(U_Tag, U_MP4);
-			better(U_Tag, U_Xiph);
+			better(f.U_Tag, f.U_APE);
+			better(f.U_Tag, f.U_ASF);
+			better(f.U_Tag, f.U_ID3v1);
+			better(f.U_Tag, f.U_ID3v2);
+			better(f.U_Tag, f.U_MP4);
+			better(f.U_Tag, f.U_Xiph);
 		}
 		if(!strip && f.APETag()){
 			cout << "\tAPE Tag:" << endl;
-			printUniTag(U_APE);
+			printUniTag(f.U_APE);
 		}
 		if(!strip && f.ASFTag()){
 			cout << "\tASF Tag:" << endl;
-			printUniTag(U_ASF);		
+			printUniTag(f.U_ASF);		
 		}
 		if(!strip && f.ID3v1Tag()){
 			cout << "\tID3v1 Tag:" << endl;
-			printUniTag(U_ID3v1);
+			printUniTag(f.U_ID3v1);
 		}
 		if(!strip && f.ID3v2Tag()){
 			cout << "\tID3v2 Tag:" << endl;
-			printUniTag(U_ID3v2);
+			printUniTag(f.U_ID3v2);
 		}
 		if(!strip && f.MP4Tag()){
 			cout << "\tMP4 Tag:" << endl;
-			printUniTag(U_MP4);
+			printUniTag(f.U_MP4);
 		}
 		if(!strip && f.XiphComment()){
 			cout << "\tXiphComment Tag:" << endl;
-			printUniTag(U_Xiph);
+			printUniTag(f.U_Xiph);
 		}
 		if(!strip && f.tag()){
 			cout << "\tTag:" << endl;
-			printUniTag(U_Tag);
+			printUniTag(f.U_Tag);
 		}
 		if(!testarg && autoarg && strip){
 			f.strip(~0);
@@ -422,64 +400,64 @@ int proc(char *file){
 				case TagLib::TagType::APE:
 					cout << "\tpreferedType: APE" << endl;
 					APETag=f.APETag(true);
-					APETag->setTitle(U_Tag.title);
-					APETag->setArtist(U_Tag.artist);
-					APETag->setAlbum(U_Tag.album);
-					APETag->setComment(U_Tag.comment);
-					APETag->setGenre(U_Tag.genre);
+					APETag->setTitle(f.U_Tag.title);
+					APETag->setArtist(f.U_Tag.artist);
+					APETag->setAlbum(f.U_Tag.album);
+					APETag->setComment(f.U_Tag.comment);
+					APETag->setGenre(f.U_Tag.genre);
 					break;
 				case TagLib::TagType::ASF:
 					cout << "\tpreferedType: ASF" << endl;
 					ASFTag=f.ASFTag(true);
-					ASFTag->setTitle(U_Tag.title);
-					ASFTag->setArtist(U_Tag.artist);
-					ASFTag->setAlbum(U_Tag.album);
-					ASFTag->setComment(U_Tag.comment);
-					ASFTag->setGenre(U_Tag.genre);
-					ASFTag->setRating(U_Tag.rating);
-					ASFTag->setCopyright(U_Tag.copyright);
+					ASFTag->setTitle(f.U_Tag.title);
+					ASFTag->setArtist(f.U_Tag.artist);
+					ASFTag->setAlbum(f.U_Tag.album);
+					ASFTag->setComment(f.U_Tag.comment);
+					ASFTag->setGenre(f.U_Tag.genre);
+					ASFTag->setRating(f.U_Tag.rating);
+					ASFTag->setCopyright(f.U_Tag.copyright);
 					break;
 				case TagLib::TagType::ID3v1:
 					cout << "\tpreferedType: ID3v1" << endl;
 					ID3v1Tag=f.ID3v1Tag(true);
-					ID3v1Tag->setTitle(U_Tag.title);
-					ID3v1Tag->setArtist(U_Tag.artist);
-					ID3v1Tag->setAlbum(U_Tag.album);
-					ID3v1Tag->setComment(U_Tag.comment);
-					ID3v1Tag->setGenre(U_Tag.genre);
+					ID3v1Tag->setTitle(f.U_Tag.title);
+					ID3v1Tag->setArtist(f.U_Tag.artist);
+					ID3v1Tag->setAlbum(f.U_Tag.album);
+					ID3v1Tag->setComment(f.U_Tag.comment);
+					ID3v1Tag->setGenre(f.U_Tag.genre);
 					break;
 				case TagLib::TagType::ID3v2:
 					cout << "\tpreferedType: ID3v2" << endl;
 					ID3v2Tag=f.ID3v2Tag(true);
-					ID3v2Tag->setTitle(U_Tag.title);
-					ID3v2Tag->setArtist(U_Tag.artist);
-					ID3v2Tag->setAlbum(U_Tag.album);
-					ID3v2Tag->setComment(U_Tag.comment);
-					ID3v2Tag->setGenre(U_Tag.genre);
+					ID3v2Tag->setTitle(f.U_Tag.title);
+					ID3v2Tag->setArtist(f.U_Tag.artist);
+					ID3v2Tag->setAlbum(f.U_Tag.album);
+					ID3v2Tag->setComment(f.U_Tag.comment);
+					ID3v2Tag->setGenre(f.U_Tag.genre);
 					break;
 				case TagLib::TagType::MP4:
 					cout << "\tpreferedType: MP4" << endl;
 					MP4Tag=f.MP4Tag(true);
-					MP4Tag->setTitle(U_Tag.title);
-					MP4Tag->setArtist(U_Tag.artist);
-					MP4Tag->setAlbum(U_Tag.album);
-					MP4Tag->setComment(U_Tag.comment);
-					MP4Tag->setGenre(U_Tag.genre);
+					MP4Tag->setTitle(f.U_Tag.title);
+					MP4Tag->setArtist(f.U_Tag.artist);
+					MP4Tag->setAlbum(f.U_Tag.album);
+					MP4Tag->setComment(f.U_Tag.comment);
+					MP4Tag->setGenre(f.U_Tag.genre);
 					break;
 				case TagLib::TagType::XiphComment:
 					cout << "\tpreferedType: XiphComment" << endl;
 					XiphComment=f.XiphComment(true);
-					XiphComment->setTitle(U_Tag.title);
-					XiphComment->setArtist(U_Tag.artist);
-					XiphComment->setAlbum(U_Tag.album);
-					XiphComment->setComment(U_Tag.comment);
-					XiphComment->setGenre(U_Tag.genre);
+					XiphComment->setTitle(f.U_Tag.title);
+					XiphComment->setArtist(f.U_Tag.artist);
+					XiphComment->setAlbum(f.U_Tag.album);
+					XiphComment->setComment(f.U_Tag.comment);
+					XiphComment->setGenre(f.U_Tag.genre);
 					break;
 				default:
 					cerr << "problematic preferedType" << endl;
 					return 0;
 			}
-			printUniTag(U_Tag);
+			printUniTag(f.U_Tag);
 		}
 		if(testarg==0){
 			f.save();

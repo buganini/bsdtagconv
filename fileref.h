@@ -130,6 +130,26 @@ namespace TagLib {
     };
   };
 
+  class UniTag {
+    public:
+    TagLib::String title;
+    TagLib::String artist;
+    TagLib::String album;
+    TagLib::String comment;
+    TagLib::String genre;
+    TagLib::String rating;
+    TagLib::String copyright;
+    UniTag(){
+      title=TagLib::String::null;
+      artist=TagLib::String::null;
+      album=TagLib::String::null;
+      comment=TagLib::String::null;
+      genre=TagLib::String::null;
+      rating=TagLib::String::null;
+      copyright=TagLib::String::null;
+    }
+  };
+
   class TAGLIB_EXPORT FileRef
   {
   public:
@@ -354,6 +374,7 @@ namespace TagLib {
     WavPack::File *wavpack;
 
     FileType::FileTypes filetype;
+    UniTag U_APE, U_ASF, U_ID3v1, U_ID3v2, U_MP4, U_Xiph, U_Tag;
 
   private:
     class FileRefPrivate;
