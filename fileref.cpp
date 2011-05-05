@@ -272,9 +272,8 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 #else
   s = fileName;
 #endif
-  if(filename!=NULL)
-    free(filename);
-  filename= strdup(fileName);
+  if(filename==NULL)
+    filename= strdup(fileName);
   // If this list is updated, the method defaultFileExtensions() should also be
   // updated.  However at some point that list should be created at the same time
   // that a default file type resolver is created.
