@@ -105,14 +105,14 @@ namespace TagLib {
     public:
     enum TagTypes
     {
-      None,
-      APE,
-      ASF,
-      ID3v1,
-      ID3v2,
-      MP4,
-      XiphComment,
-      Tag
+      None=0,
+      APE=1,
+      ASF=2,
+      ID3v1=4,
+      ID3v2=8,
+      MP4=16,
+      XiphComment=32,
+      Tag=64
     };
   };
 
@@ -341,6 +341,7 @@ namespace TagLib {
     Ogg::XiphComment * XiphComment (bool create=false);
     Tag * anyTag (bool create=false);
 
+    int tags_mask(int);
     bool strip(int tags);
 
     char *filename;

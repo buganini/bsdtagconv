@@ -256,6 +256,7 @@ int proc(char *file){
 	TagLib::MP4::Tag * MP4Tag=NULL;
 	TagLib::Ogg::XiphComment * XiphComment=NULL;
 	TagLib::FileRef f(file);
+	int stripmask=0xffff;
 	if(!f.isNull()){
 		cout << file << endl;
 		f.U_APE=f.APETag(false);
@@ -376,6 +377,7 @@ int proc(char *file){
 		}
 		if(autoarg){
 			f.U_Tag.load=true;
+			stripmask &= ~f.preferedTag();
 			switch(f.preferedTag()){
 				case TagLib::TagType::None:
 					cout << "\tpreferedType: None" << endl;
@@ -449,6 +451,12 @@ int proc(char *file){
 			printUniTag(f.U_Tag);
 		}
 		if(testarg==0){
+			/* XXX taglib works weirdly here,
+			 * strip everthing w/o id3v2 is not working
+			 * but set ID3v2, strip all, then save
+			 * keeps ID3v2 w/o others.
+			 */
+			f.strip(0xffff);
 			f.save();
 		}
 	}else{

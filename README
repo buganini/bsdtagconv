@@ -10,5 +10,4 @@ Dependencies:
 	audio/taglib
 
 TODO/BUGS:
-	strip is not clean, eg, id3v1 is auto-created when setting id3v2
 	deal with non-text field

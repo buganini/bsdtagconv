@@ -500,14 +500,13 @@ Tag * FileRef::anyTag (bool create)
 
 bool FileRef::strip (int tags)
 {
-  if(tags==0xffff){
-    U_APE.load=false;
-    U_ASF.load=false;
-    U_ID3v1.load=false;
-    U_ID3v2.load=false;
-    U_MP4.load=false;
-    U_Xiph.load=false;
-  }
+  if(tags & TagType::APE) U_APE.load=false;
+  if(tags & TagType::ID3v1) U_ID3v1.load=false;
+  if(tags & TagType::ID3v2) U_ID3v2.load=false;
+  if(tags & TagType::MP4) U_MP4.load=false;
+  if(tags & TagType::XiphComment) U_Xiph.load=false;
+cout << tags << endl;
+  tags=tags_mask(tags);
   switch(filetype)
   {
     case FileType::APE:
@@ -542,6 +541,54 @@ bool FileRef::strip (int tags)
       return true;
     default:
       return false;
+  }
+}
+
+int FileRef::tags_mask (int tags)
+{
+  int ret=0;
+  switch(filetype)
+  {
+    case FileType::APE:
+      if(tags & TagType::APE) ret|=APE::File::APE;
+      if(tags & TagType::ID3v1) ret|=APE::File::ID3v1;
+      return ret;
+    case FileType::ASF:
+      return ret;
+    case FileType::FLAC:
+      return ret;
+    case FileType::MP4:
+      return ret;
+    case FileType::MPC:
+      if(tags & TagType::APE) ret|=MPC::File::APE;
+      if(tags & TagType::ID3v1) ret|=MPC::File::ID3v1;
+      if(tags & TagType::ID3v2) ret|=MPC::File::ID3v2;
+      return ret;
+    case FileType::MPEG:
+      if(tags & TagType::APE) ret|=MPEG::File::APE;
+      if(tags & TagType::ID3v1) ret|=MPEG::File::ID3v1;
+      if(tags & TagType::ID3v2) ret|=MPEG::File::ID3v2;
+      return ret;
+    case FileType::Ogg_FLAC:
+      return ret;
+    case FileType::Ogg_Speex:
+      return ret;
+    case FileType::Ogg_Vorbis:
+      return ret;
+    case FileType::RIFF_AIFF:
+      return ret;
+    case FileType::RIFF_WAV:
+      return ret;
+    case FileType::TrueAudio:
+      if(tags & TagType::ID3v1) ret|=TrueAudio::File::ID3v1;
+      if(tags & TagType::ID3v2) ret|=TrueAudio::File::ID3v2;
+      return ret;
+    case FileType::WavPack:
+      if(tags & TagType::APE) ret|=WavPack::File::APE;
+      if(tags & TagType::ID3v1) ret|=WavPack::File::ID3v1;
+      return ret;
+    default:
+      return 0;
   }
 }
 
