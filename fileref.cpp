@@ -177,6 +177,7 @@ bool FileRef::save()
     id3t.Link(filename, ID3TT_NONE);
     id3t.Update(ID3TT_ID3V2);
     id3t.Clear();
+    delete d;
     d = new FileRefPrivate(create(filename));
     return true;
   }

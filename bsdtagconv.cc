@@ -381,7 +381,7 @@ int proc(char *file){
 			printUniTag(f.U_Tag);
 		}
 		if(!testarg && autoarg && strip){
-			f.strip(~0);
+			f.strip(0xffff);
 			f.save();
 		}
 		if(autoarg){
