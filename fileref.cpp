@@ -114,14 +114,14 @@ File *FileRef::file() const
 }
 
 unicode_t * String2Unicode_t(String str){
-    ByteVector bv=str.data(String::UTF16BE);
+    ByteVector bv=str.data(String::UTF16LE);
     char *p;
     int i,i2,l;
     p=bv.data();
     l=bv.size();
     unicode_t *ret=new unicode_t[l/2+1];
     for(i=0,i2=0;i2<l;++i,i2+=2){
-      ret[i]=((unsigned char)p[i2+1] << 8) | (unsigned char)p[i2];
+      ret[i]=((unsigned char)p[i2] << 8) | (unsigned char)p[i2+1];
     }
     ret[i]=0;
     return ret;
