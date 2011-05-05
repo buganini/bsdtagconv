@@ -337,7 +337,7 @@ namespace TagLib {
 
     bool strip(int tags);
 
-    String filename;
+    char *filename;
 
     APE::File *ape;
     ASF::File *asf;

@@ -6,10 +6,9 @@ Example:
 
 Dependencies:
 	bsdconv-5.0
+	audio/id3lib
 	audio/taglib
 
-todo:
-	ID3v2: force v2.3 and utf-16le
-
-Bugs:
+TODO:
 	strip() does not strip cleanly
+	deal with non-text field

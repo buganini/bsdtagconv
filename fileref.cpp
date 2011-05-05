@@ -37,6 +37,8 @@
 #include <taglib/tfile.h>
 #include <taglib/tstring.h>
 
+#include <id3/tag.h>
+
 #include "fileref.h"
 
 #define debug(X)
@@ -111,11 +113,73 @@ File *FileRef::file() const
   return d->file;
 }
 
+unicode_t * String2Unicode_t(String str){
+    ByteVector bv=str.data(String::UTF16BE);
+    char *p;
+    int i,i2,l;
+    p=bv.data();
+    l=bv.size();
+    unicode_t *ret=new unicode_t[l/2+1];
+    for(i=0,i2=0;i2<l;++i,i2+=2){
+      ret[i]=((unsigned char)p[i2+1] << 8) | (unsigned char)p[i2];
+    }
+    ret[i]=0;
+    return ret;
+}
+
 bool FileRef::save()
 {
   if(isNull()) {
     debug("FileRef::save() - Called without a valid file.");
     return false;
+  }
+  if(preferedTag()==TagType::ID3v2){
+    ID3_Tag id3t;
+    ID3_Frame *frame;
+    ID3v2::Tag * id3f=ID3v2Tag(true);
+    unicode_t *p;
+
+    frame=new ID3_Frame(ID3FID_TITLE);
+    frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
+    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(id3f->title()));
+    frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
+    id3t.AttachFrame(frame);
+    delete p;
+
+    frame=new ID3_Frame(ID3FID_LEADARTIST);
+    frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
+    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(id3f->artist()));
+    frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
+    id3t.AttachFrame(frame);
+    delete p;
+
+    frame=new ID3_Frame(ID3FID_ALBUM);
+    frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
+    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(id3f->album()));
+    frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
+    id3t.AttachFrame(frame);
+    delete p;
+
+    frame=new ID3_Frame(ID3FID_COMMENT);
+    frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
+    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(id3f->comment()));
+    frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
+    id3t.AttachFrame(frame);
+    delete p;
+
+    frame=new ID3_Frame(ID3FID_CONTENTTYPE);
+    frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
+    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(id3f->genre()));
+    frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
+    id3t.AttachFrame(frame);
+    delete p;
+
+    d->file->save();
+    id3t.Link(filename, ID3TT_NONE);
+    id3t.Update(ID3TT_ID3V2);
+    id3t.Clear();
+    d = new FileRefPrivate(create(filename));
+    return true;
   }
   return d->file->save();
 }
@@ -207,7 +271,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 #else
   s = fileName;
 #endif
-  filename= s + String::null;
+  filename= strdup(fileName);
   // If this list is updated, the method defaultFileExtensions() should also be
   // updated.  However at some point that list should be created at the same time
   // that a default file type resolver is created.
