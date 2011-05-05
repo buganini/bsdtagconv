@@ -10,6 +10,6 @@ Dependencies:
 	audio/taglib
 
 TODO/BUGS:
-	id3v1 vanish
+	id3v1 vanish for non-iso-8859-1 string (what encoding to render?)
 	strip() does not strip cleanly
 	deal with non-text field
