@@ -28,14 +28,6 @@
 #include <bsdconv.h>
 #include "fileref.h"
 
-enum field{
-	TITLE,
-	ARTIST,
-	ALBUM,
-	COMMENT,
-	GENRE
-};
-
 using namespace std;
 
 int convn;
