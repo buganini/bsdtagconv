@@ -5,7 +5,7 @@ Example:
 	bsdtagconv will choose the best result.
 
 Charset/Encoding Guessing:
-	By default, libbsdconv use a rough builtin appeareance frequency table,
+	By default, libbsdconv uses a rough builtin appeareance frequency table,
 	you can use `find musicdir > bsdconv utf-8,ascii:score_train:utf-8,ascii > /dev/null`
 	to build you own table, it's saved in /tmp/bsdconv.freq
 	(or path stored in BSDCONV_FREQ environment variable)
