@@ -7,8 +7,12 @@ Example:
 Charset/Encoding Guessing:
 	By default, libbsdconv uses a rough builtin appeareance frequency table,
 	you can use `find musicdir > bsdconv utf-8,ascii:score_train:utf-8,ascii > /dev/null`
-	to build you own table, it's saved in /tmp/bsdconv.freq
-	(or path stored in BSDCONV_FREQ environment variable)
+	to build you own table, it's saved in /tmp/bsdconv.score
+	(or path stored in BSDCONV_SCORE environment variable)
+
+	For a traditional chinese user, you may want to train it again with zhcn:
+	`find musicdir > bsdconv utf-8,ascii:zhcn:score_train:utf-8,ascii > /dev/null`
+	as the fact that many files with traditional chinese filename contain simplified chinese tags.
 
 Dependencies:
 	bsdconv-5.0
