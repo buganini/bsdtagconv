@@ -502,7 +502,7 @@ int main(int argc, char *argv[]){
 	}
 
 	//initialize
-	score=bsdconv_create("utf-8,ascii:normal_score:utf-8,ascii");
+	score=bsdconv_create("utf-8,ascii:score:utf-8,ascii");
 	if(score==NULL){
 		cerr << bsdconv_error() << endl;
 		exit(1);
@@ -532,7 +532,7 @@ int main(int argc, char *argv[]){
 			cerr << bsdconv_error() << endl;
 			exit(1);
 		}
-		bsdconv_insert_phase(convs[i], "NORMAL_SCORE", INTER, 1);
+		bsdconv_insert_phase(convs[i], "SCORE", INTER, 1);
 		bsdconv_insert_phase(convs[i], "RAW,ASCII", TO, 0);
 		bsdconv_insert_phase(convs[i], "UTF-8,ASCII", FROM, 0);
 	}
