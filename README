@@ -1,3 +1,6 @@
+Note:
+	This program is assuming you are using UTF-8 environment.
+
 Example:
 	bsdtagconv 'gbk,ascii;big5,ascii' -i zhtw:zhtw_words --auto -r big5,ascii blah.mp3
 	argv[1] is ';' joined from-conversion, for decoding tags which use
