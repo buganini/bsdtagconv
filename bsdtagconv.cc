@@ -752,8 +752,10 @@ int main(int argc, char *argv[]){
 
 	if(testarg)
 		cerr << endl << "Use --notest to actually write the files" << endl;
-	fclose(scoredb);
-	unlink(scoredb_path);
+	if(score_pathn>0){
+		fclose(scoredb);
+		unlink(scoredb_path);
+	}
 
 	return 0;
 }
