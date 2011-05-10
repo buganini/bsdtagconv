@@ -17,6 +17,9 @@ Charset/Encoding Guessing:
 	`find musicdir > bsdconv utf-8,ascii:zhcn:score_train:utf-8,ascii > /dev/null`
 	as the fact that many files with traditional chinese filename contain simplified chinese tags.
 
+	Alternatively, with --guess-by-path, it detect encoding by matching with path string,
+	you can you "-v zhcn" to train it as what previous paragraph do at runtime.
+
 Dependencies:
 	bsdconv-5.0
 	audio/id3lib
