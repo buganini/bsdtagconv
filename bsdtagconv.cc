@@ -30,6 +30,9 @@
 
 using namespace std;
 
+FILE *scoredb;
+int scoredbfd;
+
 int convn;
 int testarg,skiparg,skip,autoarg,eachconv,strip;
 int force_decode_all;
@@ -42,8 +45,10 @@ int force_decode_xiph;
 struct bsdconv_instance **convs;
 struct bsdconv_instance *inter;
 struct bsdconv_instance *score;
+struct bsdconv_instance **score_path;
 struct bsdconv_instance *render;
 int *scores;
+int score_pathn;
 int bestCodec;
 
 class ID3v1StringHandler : public TagLib::ID3v1::StringHandler
@@ -231,13 +236,49 @@ void printUniTag(TagLib::UniTag &U){
 }
 
 void better(TagLib::UniTag &A, TagLib::UniTag &B){
-	if(score_eval(A.title) < score_eval(B.title)) A.title=B.title;
-	if(score_eval(A.artist) < score_eval(B.artist)) A.artist=B.artist;
-	if(score_eval(A.album) < score_eval(B.album)) A.album=B.album;
-	if(score_eval(A.comment) < score_eval(B.comment)) A.comment=B.comment;
-	if(score_eval(A.genre) < score_eval(B.genre)) A.genre=B.genre;
-	if(score_eval(A.rating) < score_eval(B.rating)) A.rating=B.rating;
-	if(score_eval(A.copyright) < score_eval(B.copyright)) A.copyright=B.copyright;
+	int a=0,b=0;
+	if(A.title.length()==0 || score_eval(A.title) < score_eval(B.title))
+		b+=1;
+	else
+		a+=1;
+
+	if(A.artist.length()==0 || score_eval(A.artist) < score_eval(B.artist))
+		b+=1;
+	else
+		a+=1;
+
+	if(A.album.length()==0 || score_eval(A.album) < score_eval(B.album))
+		b+=1;
+	else
+		a+=1;
+
+	if(A.comment.length()==0 || score_eval(A.comment) < score_eval(B.comment))
+		b+=1;
+	else
+		a+=1;
+
+	if(A.genre.length()==0 || score_eval(A.genre) < score_eval(B.genre))
+		b+=1;
+	else
+		a+=1;
+
+	if(A.rating.length()==0 || score_eval(A.rating) < score_eval(B.rating))
+		b+=1;
+	else
+		a+=1;
+
+	if(A.copyright.length()==0 || score_eval(A.copyright) < score_eval(B.copyright))
+		b+=1;
+	else
+		a+=1;
+
+	if(b>a || A.title.length()==0) A.title=B.title;
+	if(b>a || A.artist.length()==0) A.artist=B.artist;
+	if(b>a || A.album.length()==0) A.album=B.album;
+	if(b>a || A.comment.length()==0) A.comment=B.comment;
+	if(b>a || A.genre.length()==0) A.genre=B.genre;
+	if(b>a || A.rating.length()==0) A.rating=B.rating;
+	if(b>a || A.copyright.length()==0) A.copyright=B.copyright;
 }
 
 int proc(char *file){
@@ -249,7 +290,18 @@ int proc(char *file){
 	TagLib::Ogg::XiphComment * XiphComment=NULL;
 	TagLib::FileRef f(file);
 	int stripmask=0xffff;
+	int i;
 	if(!f.isNull()){
+		if(score_pathn>0)
+			for(i=0;i<score_pathn;++i){
+				bsdconv_init(score_path[i]);
+				score_path[i]->output_mode=BSDCONV_HOLD;
+				score_path[i]->input.data=file;
+				score_path[i]->input.len=strlen(file);
+				score_path[i]->input.flags=0;
+				score_path[i]->flush=1;
+				bsdconv(score_path[i]);
+			}
 		cout << file << endl;
 		f.U_APE=f.APETag(false);
 		f.U_ASF=f.ASFTag(false);
@@ -452,6 +504,8 @@ int proc(char *file){
 			f.strip(0xffff);
 			f.save();
 		}
+		if(score_pathn>0)
+			ftruncate(scoredbfd, 0);
 	}else{
 		return 0;
 	}
@@ -466,6 +520,7 @@ void usage(){
 	cerr << "\t--auto: Merge all tags with selectng the best data and write into prefered tag" << endl;
 	cerr << "\t--strip: (require --auto) Remove all tags before writing prefered tag" << endl;
 	cerr << "\t--each-conv: Don't assume all fields use the same encoding" << endl;
+	cerr << "\t--guess-by-path: Detect encoding by matching with path" << endl;
 	cerr << "\t--force-decode-all: Decode tag(s) as ID3v1" << endl;
 	cerr << "\t--force-decode-ape:" << endl;
 	cerr << "\t--force-decode-asf:" << endl;
@@ -474,11 +529,13 @@ void usage(){
 	cerr << "\t--force-decode-xiph:" << endl;
 	cerr << "\t-i: inter-convertion" << endl;
 	cerr << "\t-r: to-conversion for rendering ID3v1" << endl;
+	cerr << "\t-v: inter-conversion for training score table with varianting conversion (could be specified multiple times)" << endl;
 }
 
 int main(int argc, char *argv[]){
 	int i,argb,intern;
 	char *c, *t,*convarg, *arg;
+	char scoredb_path[64]={0};
 
 	inter=NULL;
 	render=NULL;
@@ -488,6 +545,7 @@ int main(int argc, char *argv[]){
 	eachconv=0;
 	testarg=1;
 	skiparg=1;
+	score_pathn=0;
 	force_decode_all=0;
 	force_decode_ape=0;
 	force_decode_asf=0;
@@ -532,7 +590,7 @@ int main(int argc, char *argv[]){
 			cerr << bsdconv_error() << endl;
 			exit(1);
 		}
-		bsdconv_insert_phase(convs[i], "SCORE", INTER, 1);
+		bsdconv_insert_phase(convs[i], "score", INTER, 1);
 		bsdconv_insert_phase(convs[i], "RAW,ASCII", TO, 0);
 		bsdconv_insert_phase(convs[i], "UTF-8,ASCII", FROM, 0);
 	}
@@ -566,6 +624,32 @@ int main(int argc, char *argv[]){
 			force_decode_mp4=1;
 		}else if(strcmp(argv[argb],"--force-decode-xiph")==0){
 			force_decode_xiph=1;
+		}else if(strcmp(argv[argb],"--guess-by-path")==0){
+			score_pathn=1;
+			score_path=(struct bsdconv_instance **)malloc(sizeof(struct bsdconv_instance *) * 8);
+			score_path[0]=bsdconv_create("utf-8,ascii:score_train:pass");
+			sprintf(scoredb_path,"/tmp/.bsdtagconv.score_path.XXXXX");
+			scoredbfd=mkstemp(scoredb_path);
+			scoredb=fdopen(scoredbfd, "w+");
+		}else if(strcmp(argv[argb],"-v")==0){
+			if(argb+1<argc){
+				argb+=1;
+				score_path=(struct bsdconv_instance **)realloc(score_path, sizeof(struct bsdconv_instance *) * (score_pathn+1));
+				score_path[score_pathn]=bsdconv_create("utf-8,ascii:score_train:utf-8,ascii");
+				arg=strdup(argv[argb]);
+				c=arg;
+				i=0;
+				while(c!=NULL && *c){
+					t=strsep(&c, ":");
+					if(bsdconv_insert_phase(score_path[score_pathn], t, INTER, i+1)<0){
+						cerr << bsdconv_error() << endl;
+						exit(1);
+					}
+					i+=1;
+				}
+				free(arg);
+				score_pathn+=1;
+			}
 		}else if(strcmp(argv[argb],"-h")==0 || strcmp(argv[argb],"--help")==0){
 			usage();
 			exit(0);
@@ -638,6 +722,16 @@ int main(int argc, char *argv[]){
 
 	TagLib::ID3v1::Tag::setStringHandler( new ID3v1StringHandler() );
 
+	if(score_pathn>0){
+		bsdconv_ctl(score,BSDCONV_SCORE_ATTACH, scoredb, 0);
+		for(i=0;i<score_pathn;++i){
+			bsdconv_ctl(score_path[i],BSDCONV_SCORE_ATTACH, scoredb, 0);
+		}
+		for(i=0;i<convn;++i){
+			bsdconv_ctl(convs[i],BSDCONV_SCORE_ATTACH, scoredb, 0);
+		}
+	}
+
 	//proceed
 	for(i=argb;i<argc;++i){
 		proc(argv[i]);
@@ -647,6 +741,9 @@ int main(int argc, char *argv[]){
 	for(i=0;i<convn;++i){
 		bsdconv_destroy(convs[i]);
 	}
+	for(i=0;i<score_pathn;++i){
+		bsdconv_destroy(score_path[i]);
+	}
 	free(convs);
 	free(scores);
 	bsdconv_destroy(score);
@@ -655,6 +752,8 @@ int main(int argc, char *argv[]){
 
 	if(testarg)
 		cerr << endl << "Use --notest to actually write the files" << endl;
+	fclose(scoredb);
+	unlink(scoredb_path);
 
 	return 0;
 }
