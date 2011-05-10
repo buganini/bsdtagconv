@@ -17,7 +17,8 @@ Charset/Encoding Guessing:
 	`find musicdir > bsdconv utf-8,ascii:zhcn:score_train:utf-8,ascii > /dev/null`
 	as the fact that many files with traditional chinese filename contain simplified chinese tags.
 
-	Alternatively, with --guess-by-path, it detect encoding by matching with path string,
+	Alternatively, if your directory structure could be referenced as metadata,
+	with --guess-by-path, it detect encoding by matching with path string,
 	you can you "-v zhcn" to train it as what previous paragraph do at runtime.
 
 Dependencies:
