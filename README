@@ -18,8 +18,8 @@ Charset/Encoding Guessing:
 	as the fact that many files with traditional chinese filename contain simplified chinese tags.
 
 	Alternatively, if your directory structure could be referenced as metadata,
-	with --guess-by-path, it detect encoding by matching with path string,
-	you can you "-v zhcn" to train it as what previous paragraph do at runtime.
+	with --guess-by-path, it detects encoding by matching with path string,
+	you can use "-v zhcn" to train it as what previous paragraph does at runtime.
 
 Dependencies:
 	bsdconv-5.0
