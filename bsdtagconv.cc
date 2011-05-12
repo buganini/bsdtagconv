@@ -631,6 +631,7 @@ int main(int argc, char *argv[]){
 			sprintf(scoredb_path,"/tmp/.bsdtagconv.score_path.XXXXX");
 			scoredbfd=mkstemp(scoredb_path);
 			scoredb=fdopen(scoredbfd, "w+");
+			unlink(scoredb_path);
 		}else if(strcmp(argv[argb],"-v")==0){
 			if(argb+1<argc){
 				argb+=1;
@@ -754,7 +755,6 @@ int main(int argc, char *argv[]){
 		cerr << endl << "Use --notest to actually write the files" << endl;
 	if(score_pathn>0){
 		fclose(scoredb);
-		unlink(scoredb_path);
 	}
 
 	return 0;
