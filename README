@@ -22,7 +22,7 @@ Charset/Encoding Guessing:
 	you can use "-v zhcn" to train it as what previous paragraph does at runtime.
 
 Dependencies:
-	bsdconv-5.0
+	bsdconv-5.1
 	audio/taglib 1.8+
 
 TODO/BUGS:
