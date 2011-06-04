@@ -292,16 +292,15 @@ int proc(char *file){
 	int stripmask=0xffff;
 	int i;
 	if(!f.isNull()){
-		if(score_pathn>0)
-			for(i=0;i<score_pathn;++i){
-				bsdconv_init(score_path[i]);
-				score_path[i]->output_mode=BSDCONV_HOLD;
-				score_path[i]->input.data=file;
-				score_path[i]->input.len=strlen(file);
-				score_path[i]->input.flags=0;
-				score_path[i]->flush=1;
-				bsdconv(score_path[i]);
-			}
+		for(i=0;i<score_pathn;++i){
+			bsdconv_init(score_path[i]);
+			score_path[i]->output_mode=BSDCONV_HOLD;
+			score_path[i]->input.data=file;
+			score_path[i]->input.len=strlen(file);
+			score_path[i]->input.flags=0;
+			score_path[i]->flush=1;
+			bsdconv(score_path[i]);
+		}
 		cout << file << endl;
 		f.U_APE=f.APETag(false);
 		f.U_ASF=f.ASFTag(false);
@@ -622,7 +621,7 @@ int main(int argc, char *argv[]){
 		}else if(strcmp(argv[argb],"--guess-by-path")==0){
 			score_pathn=1;
 			score_path=(struct bsdconv_instance **)malloc(sizeof(struct bsdconv_instance *) * 8);
-			score_path[0]=bsdconv_create("utf-8,ascii:score_train:pass");
+			score_path[0]=bsdconv_create("utf-8,ascii:score_train:null");
 			sprintf(scoredb_path,"/tmp/.bsdtagconv.score_path.XXXXX");
 			scoredbfd=mkstemp(scoredb_path);
 			scoredb=fdopen(scoredbfd, "w+");
@@ -631,7 +630,7 @@ int main(int argc, char *argv[]){
 			if(argb+1<argc){
 				argb+=1;
 				score_path=(struct bsdconv_instance **)realloc(score_path, sizeof(struct bsdconv_instance *) * (score_pathn+1));
-				score_path[score_pathn]=bsdconv_create("utf-8,ascii:score_train:utf-8,ascii");
+				score_path[score_pathn]=bsdconv_create("utf-8,ascii:score_train:null");
 				arg=strdup(argv[argb]);
 				c=arg;
 				i=0;
