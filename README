@@ -23,8 +23,8 @@ Charset/Encoding Guessing:
 
 Dependencies:
 	bsdconv-5.0
-	audio/id3lib
-	audio/taglib
+	audio/taglib 1.8+
 
 TODO/BUGS:
+	id3v2 only (w/o id3v1)
 	deal with non-text field

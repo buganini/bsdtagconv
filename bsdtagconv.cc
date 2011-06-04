@@ -495,13 +495,8 @@ int proc(char *file){
 			printUniTag(f.U_Tag);
 		}
 		if(testarg==0){
-			//f.strip(stripmask);
-			/* XXX taglib works weirdly here,
-			 * strip everthing except for id3v2 is not working
-			 * but set ID3v2, strip all, then save
-			 * keeps ID3v2 w/o others.
-			 */
-			f.strip(0xffff);
+			f.save();
+			f.strip(stripmask);
 			f.save();
 		}
 		if(score_pathn>0)

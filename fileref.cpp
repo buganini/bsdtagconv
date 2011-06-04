@@ -37,8 +37,6 @@
 #include <taglib/tfile.h>
 #include <taglib/tstring.h>
 
-#include <id3/tag.h>
-
 #include "fileref.h"
 
 #define debug(X)
@@ -114,20 +112,6 @@ File *FileRef::file() const
   return d->file;
 }
 
-unicode_t * String2Unicode_t(String str){
-    ByteVector bv=str.data(String::UTF16LE);
-    char *p;
-    int i,i2,l;
-    p=bv.data();
-    l=bv.size();
-    unicode_t *ret=new unicode_t[l/2+1];
-    for(i=0,i2=0;i2<l;++i,i2+=2){
-      ret[i]=((unsigned char)p[i2] << 8) | (unsigned char)p[i2+1];
-    }
-    ret[i]=0;
-    return ret;
-}
-
 bool FileRef::save()
 {
   if(isNull()) {
@@ -135,51 +119,8 @@ bool FileRef::save()
     return false;
   }
   if(preferedTag()==TagType::ID3v2 || U_ID3v2.load){
-    ID3_Tag id3t;
-    ID3_Frame *frame;
-    unicode_t *p;
-
-    frame=new ID3_Frame(ID3FID_TITLE);
-    frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
-    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.title));
-    frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
-    id3t.AttachFrame(frame);
-    delete [] p;
-
-    frame=new ID3_Frame(ID3FID_LEADARTIST);
-    frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
-    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.artist));
-    frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
-    id3t.AttachFrame(frame);
-    delete [] p;
-
-    frame=new ID3_Frame(ID3FID_ALBUM);
-    frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
-    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.album));
-    frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
-    id3t.AttachFrame(frame);
-    delete [] p;
-
-    frame=new ID3_Frame(ID3FID_COMMENT);
-    frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
-    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.comment));
-    frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
-    id3t.AttachFrame(frame);
-    delete [] p;
-
-    frame=new ID3_Frame(ID3FID_CONTENTTYPE);
-    frame->GetField(ID3FN_TEXT)->SetEncoding(ID3TE_UNICODE);
-    frame->GetField(ID3FN_TEXT)->Set(p=String2Unicode_t(U_ID3v2.genre));
-    frame->GetField(ID3FN_TEXTENC)->Set(ID3TE_UNICODE);
-    id3t.AttachFrame(frame);
-    delete [] p;
-
-    d->file->save();
-    delete d;
-    id3t.Link(filename, ID3TT_NONE);
-    id3t.Update(ID3TT_ID3V2);
-    id3t.Clear();
-    d = new FileRefPrivate(create(filename));
+    
+    dynamic_cast<MPEG::File *>(d->file)->save(tags_mask(0xff), true, 3);
     return true;
   }
   return d->file->save();
