@@ -26,5 +26,6 @@ Dependencies:
 	audio/taglib 1.8+
 
 TODO/BUGS:
+	import argument-design from gbsdconv
 	id3v2 only (w/o id3v1)
 	deal with non-text field
